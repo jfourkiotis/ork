@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ork", "ork\ork.csproj", "{F9E4719C-43D8-48DB-B92C-CC1D703BB360}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ork.tests", "ork.tests\ork.tests.csproj", "{8B965150-609D-4A02-AF89-11096A5CDFC3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F9E4719C-43D8-48DB-B92C-CC1D703BB360}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9E4719C-43D8-48DB-B92C-CC1D703BB360}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9E4719C-43D8-48DB-B92C-CC1D703BB360}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B965150-609D-4A02-AF89-11096A5CDFC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B965150-609D-4A02-AF89-11096A5CDFC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B965150-609D-4A02-AF89-11096A5CDFC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B965150-609D-4A02-AF89-11096A5CDFC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
