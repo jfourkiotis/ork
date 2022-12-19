@@ -54,11 +54,11 @@ namespace ork.ast
         }
     }
 
-    public sealed class Expressionstatement : IStatement
+    public sealed class ExpressionStatement : IStatement
     {
         private readonly Token token;
       
-        public Expressionstatement(Token token, IExpression? expression)
+        public ExpressionStatement(Token token, IExpression? expression)
         {
             this.token = token;
             Expression = expression;
