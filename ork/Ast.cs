@@ -157,4 +157,24 @@ namespace ork.ast
             return base.ToString();
         }
     }
+
+    public sealed class IntegerLiteral : IExpression
+    {
+        private readonly Token token;
+
+        public IntegerLiteral(Token token, Int64 val)
+        {
+            this.token = token;
+            Value = val;
+        }
+
+        public Int64 Value { get; }
+
+        public string TokenLiteral => token.Literal;
+
+        public override string? ToString()
+        {
+            return token.Literal;
+        }
+    }
 }

@@ -19,7 +19,9 @@ namespace ork.parser
         private readonly IDictionary<TokenTag, PrefixParseFn> prefixParseFns = new Dictionary<TokenTag, PrefixParseFn>()
         {
             { TokenTag.Ident, p => p.ParseIdentifier() },
+            { TokenTag.Int, p => p.ParseIntegerLiteral() },
         };
+
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public Parser(Lexer lexer)
@@ -133,6 +135,17 @@ namespace ork.parser
         private IExpression? ParseIdentifier()
         {
             return new Identifier(curToken);
+        }
+
+        private IExpression? ParseIntegerLiteral()
+        {
+            Int64 val;
+            if (!Int64.TryParse(curToken.Literal, out val))
+            {
+                Errors.Add($"could not parse '{curToken.Literal}' as an integer");
+                return null;
+            }
+            return new IntegerLiteral(curToken, val);
         }
 
         private bool ExpectPeek(TokenTag tag)

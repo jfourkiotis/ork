@@ -79,5 +79,26 @@ namespace ork.tests
 
             Assert.AreEqual("foobar", id.TokenLiteral);
         }
+
+        [TestMethod]
+        public void TestIntegerLiteralExpressions()
+        {
+            string input = "5;";
+
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);
+            Assert.IsNotNull(program);
+            Assert.AreEqual(1, program.Statements.Count);
+
+            ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(es);
+
+            IntegerLiteral? id = es.Expression as IntegerLiteral;
+            Assert.IsNotNull(id);
+
+            Assert.AreEqual("5", id.TokenLiteral);
+        }
     }
 }
