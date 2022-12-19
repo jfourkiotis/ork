@@ -72,7 +72,9 @@ namespace ork.parser
                 NextToken();
             }
 
-            return new LetStatement(letToken, id);
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+            return new LetStatement(letToken, id, null);
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         private ReturnStatement? ParseReturnStatement()
