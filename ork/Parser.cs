@@ -4,11 +4,22 @@ using ork.tokens;
 
 namespace ork.parser
 {
+    using PrefixParseFn = Func<Parser, IExpression?>;
+
+    public enum Precedence
+    {
+        Lowest,
+    }
+
     public sealed class Parser
     {
         private Lexer lexer;
         private Token curToken;
         private Token peekToken;
+        private readonly IDictionary<TokenTag, PrefixParseFn> prefixParseFns = new Dictionary<TokenTag, PrefixParseFn>()
+        {
+            { TokenTag.Ident, p => p.ParseIdentifier() },
+        };
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public Parser(Lexer lexer)
@@ -46,8 +57,34 @@ namespace ork.parser
         {
             TokenTag.Let => ParseLetStatement(),
             TokenTag.Return => ParseReturnStatement(),
-            _ => null,
+            _ => ParseExpressionStatement(),
         };
+
+        private ExpressionStatement? ParseExpressionStatement()
+        {
+            Token token = curToken;
+            var expression = ParseExpression(Precedence.Lowest);
+
+            // we want expression statements to have optional semicolons
+            // since this makes it easier to type an expression in a 
+            // future REPL
+            if (PeekTokenIs(TokenTag.Semicolon))
+            {
+                NextToken();
+            }
+            return new ExpressionStatement(token, expression);
+        }
+
+        private IExpression? ParseExpression(Precedence prec)
+        {
+            PrefixParseFn? prefix;
+            if (!prefixParseFns.TryGetValue(curToken.Tag, out prefix))
+            {
+                return null;
+            }
+
+            return prefix(this);
+        }
 
         private LetStatement? ParseLetStatement()
         {
@@ -91,6 +128,11 @@ namespace ork.parser
             }
 
             return new ReturnStatement(returnToken, null);
+        }
+
+        private IExpression? ParseIdentifier()
+        {
+            return new Identifier(curToken);
         }
 
         private bool ExpectPeek(TokenTag tag)

@@ -58,5 +58,26 @@ namespace ork.tests
                 Assert.AreEqual("return", rs.TokenLiteral);
             }
         }
+
+        [TestMethod]
+        public void TestIdentifierExpressions() 
+        {
+            string input = "foobar;";
+
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);  
+            Assert.IsNotNull(program);
+            Assert.AreEqual(1, program.Statements.Count);
+
+            ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(es);
+            
+            Identifier? id = es.Expression as Identifier;
+            Assert.IsNotNull(id);
+
+            Assert.AreEqual("foobar", id.TokenLiteral);
+        }
     }
 }
