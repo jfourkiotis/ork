@@ -45,6 +45,7 @@ namespace ork.parser
         private IStatement? ParseStatement() => curToken.Tag switch
         {
             TokenTag.Let => ParseLetStatement(),
+            TokenTag.Return => ParseReturnStatement(),
             _ => null,
         };
 
@@ -64,14 +65,30 @@ namespace ork.parser
                 return null;
             }
 
-            // FIXME: consume all tokens until a semicolon is
-            // encountered
+            // TODO: consume all tokens until a semicolon is
+            // found
             while (!CurTokenIs(TokenTag.Semicolon))
             {
                 NextToken();
             }
 
             return new LetStatement(letToken, id);
+        }
+
+        private ReturnStatement? ParseReturnStatement()
+        {
+            Token returnToken = curToken;
+
+            NextToken(); // expression start
+
+            // TODO: consume all tokens until a semicolon is
+            // found
+            while (!CurTokenIs(TokenTag.Semicolon))
+            {
+                NextToken();
+            }
+
+            return new ReturnStatement(returnToken, null);
         }
 
         private bool ExpectPeek(TokenTag tag)

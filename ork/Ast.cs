@@ -69,4 +69,20 @@ namespace ork.ast
 
         public string TokenLiteral => token.Literal;
     }
+
+    public sealed class ReturnStatement : IStatement
+    {
+        // TokenTag.Return
+        private readonly Token token;
+
+        public ReturnStatement(Token token, IExpression? expression)
+        {
+            this.token = token;
+            Expression = expression;
+        }
+
+        public IExpression? Expression { get; }
+
+        public string TokenLiteral => token.Literal;
+    }
 }

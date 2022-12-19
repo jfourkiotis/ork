@@ -34,5 +34,29 @@ namespace ork.tests
                 Assert.AreEqual(First, ls.Name.TokenLiteral);
             }
         }
+
+        [TestMethod]
+        public void TestReturnStatements()
+        {
+            string input = """
+                return 5;
+                return 10;
+                return 993322;
+                """;
+
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);
+            Assert.IsNotNull(program);
+            Assert.AreEqual(3, program.Statements.Count);
+
+            foreach (var stmt in program.Statements)
+            {
+                ReturnStatement? rs = stmt as ReturnStatement;
+                Assert.IsNotNull(rs);
+                Assert.AreEqual("return", rs.TokenLiteral);
+            }
+        }
     }
 }
