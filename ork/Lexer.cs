@@ -102,8 +102,7 @@
 
             var literal = input.Substring(pos, position - pos);
 
-            TokenTag keyTag;
-            if (Keywords.TryGetValue(literal, out keyTag))
+            if (Keywords.TryGetValue(literal, out TokenTag keyTag))
             {
                 return new Token(keyTag, literal);
             }

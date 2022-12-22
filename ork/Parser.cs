@@ -79,8 +79,7 @@ namespace ork.parser
 
         private IExpression? ParseExpression(Precedence prec)
         {
-            PrefixParseFn? prefix;
-            if (!prefixParseFns.TryGetValue(curToken.Tag, out prefix))
+            if (!prefixParseFns.TryGetValue(curToken.Tag, out PrefixParseFn? prefix))
             {
                 return null;
             }
@@ -139,8 +138,7 @@ namespace ork.parser
 
         private IExpression? ParseIntegerLiteral()
         {
-            Int64 val;
-            if (!Int64.TryParse(curToken.Literal, out val))
+            if (!Int64.TryParse(curToken.Literal, out Int64 val))
             {
                 Errors.Add($"could not parse '{curToken.Literal}' as an integer");
                 return null;
