@@ -1,12 +1,11 @@
 ﻿using ork.lexer;
 using ork.tokens;
-using System;
 
-internal class OrkDriver
+internal static class OrkDriver
 {
-    private static void Main(string[] args)
+    private static void Main()
     {
-        Console.WriteLine($"Hello {System.Environment.UserName}! This is the ORK programming language!");
+        Console.WriteLine($"Hello {Environment.UserName}! This is the ORK programming language!");
         Console.WriteLine("Feel free to type in commands");
         Start();
     }

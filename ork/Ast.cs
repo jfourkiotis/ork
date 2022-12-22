@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Text;
+﻿using System.Text;
 
 using ork.tokens;
 
@@ -9,7 +6,7 @@ namespace ork.ast
 {
     public interface INode
     {
-        public abstract string TokenLiteral { get; }
+        public string TokenLiteral { get; }
     }
 
     public interface IStatement : INode
@@ -43,12 +40,12 @@ namespace ork.ast
             }
         }
 
-        public override string? ToString()
+        public override string ToString()
         {
             StringBuilder sb = new();
             foreach (var statement in Statements)
             {
-                sb.Append(statement.ToString());
+                sb.Append(statement);
             }
             return sb.ToString();
         }
@@ -68,7 +65,7 @@ namespace ork.ast
         public IExpression? Expression { get; }
 
 
-        public override string? ToString() => Expression?.ToString() ?? "";
+        public override string ToString() => Expression?.ToString() ?? "";
     }
 
     public sealed class Identifier : IExpression
@@ -81,7 +78,7 @@ namespace ork.ast
 
         public string TokenLiteral => token.Literal;
 
-        public override string? ToString()
+        public override string ToString()
         {
             return token.Literal;
         }
@@ -109,17 +106,17 @@ namespace ork.ast
 
         public string TokenLiteral => token.Literal;
 
-        public override string? ToString()
+        public override string ToString()
         {
             StringBuilder sb = new();
             sb.Append(token.Literal);
             sb.Append(' ');
-            sb.Append(Name.ToString());
+            sb.Append(Name);
             sb.Append(" = ");
 
             if (Expression != null)
             {
-                sb.Append(Expression.ToString());
+                sb.Append(Expression);
             }
 
             sb.Append(';');
@@ -150,7 +147,7 @@ namespace ork.ast
             if (Expression != null) 
             {
                 sb.Append(' ');
-                sb.Append(Expression.ToString());
+                sb.Append(Expression);
             }
 
             sb.Append(';');
@@ -172,7 +169,7 @@ namespace ork.ast
 
         public string TokenLiteral => token.Literal;
 
-        public override string? ToString()
+        public override string ToString()
         {
             return token.Literal;
         }

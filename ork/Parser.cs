@@ -62,7 +62,7 @@ namespace ork.parser
             _ => ParseExpressionStatement(),
         };
 
-        private ExpressionStatement? ParseExpressionStatement()
+        private ExpressionStatement ParseExpressionStatement()
         {
             Token token = curToken;
             var expression = ParseExpression(Precedence.Lowest);
@@ -116,7 +116,7 @@ namespace ork.parser
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
-        private ReturnStatement? ParseReturnStatement()
+        private ReturnStatement ParseReturnStatement()
         {
             Token returnToken = curToken;
 
@@ -132,7 +132,7 @@ namespace ork.parser
             return new ReturnStatement(returnToken, null);
         }
 
-        private IExpression? ParseIdentifier()
+        private IExpression ParseIdentifier()
         {
             return new Identifier(curToken);
         }

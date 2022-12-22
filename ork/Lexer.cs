@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ork.lexer
+﻿namespace ork.lexer
 {
-    using ork.tokens;
+    using tokens;
 
     public class Lexer
     {
-        private static readonly IDictionary<string, TokenTag> keywords =
+        private static readonly IDictionary<string, TokenTag> Keywords =
             new Dictionary<string, TokenTag>()
             {
                 { "fn", TokenTag.Function },
@@ -106,10 +102,10 @@ namespace ork.lexer
 
             var literal = input.Substring(pos, position - pos);
 
-            TokenTag key_tag;
-            if (keywords.TryGetValue(literal, out key_tag))
+            TokenTag keyTag;
+            if (Keywords.TryGetValue(literal, out keyTag))
             {
-                return new Token(key_tag, literal);
+                return new Token(keyTag, literal);
             }
             return new Token(TokenTag.Ident, literal);
         }
