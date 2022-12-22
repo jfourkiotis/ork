@@ -101,8 +101,8 @@ namespace ork.ast
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
-        public Identifier Name { get; private set; }
-        public IExpression Expression { get; private set; }
+        public Identifier Name { get; }
+        public IExpression Expression { get; }
 
         public string TokenLiteral => token.Literal;
 
