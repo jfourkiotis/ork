@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Engines;
 using ork.lexer;
 using ork.tokens;
 using System.Text;
@@ -8,13 +7,13 @@ namespace ork.benchmarks
 {
     public interface IGenRandomToken
     {
-        public abstract string Generate();
+        public string Generate();
     }
 
     public class RIdent : IGenRandomToken
     {
         private static Random random = new Random();
-        private readonly string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvxyz0123456789";
+        private readonly string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         public string Generate()
         {
             return new string(Enumerable.Repeat(chars, 8).Select(s => s[random.Next(s.Length)]).ToArray());
@@ -70,7 +69,7 @@ namespace ork.benchmarks
     [MinColumn, MaxColumn, MeanColumn, MedianColumn]
     public class LexerBenchmarks
     {
-        private string input;
+        private readonly string input;
         public LexerBenchmarks()
         {
             input = GetRandomInput();
@@ -78,7 +77,7 @@ namespace ork.benchmarks
         private string GetRandomInput()
         {
             Random random = new Random(14);
-            IGenRandomToken[] random_tokens = 
+            IGenRandomToken[] randomTokens = 
             {
                 new RIdent(),
                 new RKeyword(),
@@ -93,7 +92,7 @@ namespace ork.benchmarks
             {
                 for (int j = 0; j < 19; ++j)
                 {
-                    sb.Append(random_tokens[random.Next(random_tokens.Length)].Generate());
+                    sb.Append(randomTokens[random.Next(randomTokens.Length)].Generate());
                     sb.Append(' ');
                 }
                 sb.Append(';');

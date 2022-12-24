@@ -1,6 +1,5 @@
 ﻿using ork.tokens;
 using ork.lexer;
-using System.Data.Common;
 
 namespace ork.tests
 {
@@ -10,7 +9,7 @@ namespace ork.tests
         [TestMethod]
         public void TestNextTokenSimple()
         {
-            string input = "=+(){},;";
+            const string input = "=+(){},;";
 
             var tests = new[]
             {

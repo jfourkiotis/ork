@@ -1,5 +1,4 @@
 ﻿using ork.lexer;
-using ork.tokens;
 using ork.ast;
 using ork.parser;
 
@@ -25,13 +24,13 @@ namespace ork.tests
             Assert.AreEqual(3, program.Statements.Count);
 
             string[] tests = { "x", "y", "foobar" };
-            foreach (var (First, Second) in tests.Zip(program.Statements)) 
+            foreach (var (first, second) in tests.Zip(program.Statements)) 
             {
-                Assert.AreEqual("let", Second.TokenLiteral);
+                Assert.AreEqual("let", second.TokenLiteral);
                 
-                LetStatement? ls = Second as LetStatement;
+                LetStatement? ls = second as LetStatement;
                 Assert.IsNotNull(ls);
-                Assert.AreEqual(First, ls.Name.TokenLiteral);
+                Assert.AreEqual(first, ls.Name.TokenLiteral);
             }
         }
 

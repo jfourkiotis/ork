@@ -13,7 +13,7 @@ namespace ork.parser
 
     public sealed class Parser
     {
-        private Lexer lexer;
+        private readonly Lexer lexer;
         private Token curToken;
         private Token peekToken;
         private readonly IDictionary<TokenTag, PrefixParseFn> prefixParseFns = new Dictionary<TokenTag, PrefixParseFn>()
