@@ -99,5 +99,31 @@ namespace ork.tests
 
             Assert.AreEqual("5", id.TokenLiteral);
         }
+
+        [TestMethod]
+        public void TestPrefixExpressions()
+        {
+            var tests = new[]
+            {
+                new {Input = "!5;", Operator = "!", Literal = "5"},
+                new {Input = "-5;", Operator = "-", Literal = "5"},
+            };
+
+            foreach (var test in tests)
+            {
+                var lexer = new Lexer(test.Input);
+                var parser = new Parser(lexer);
+                var program = parser.ParseProgram();
+                Assert.AreEqual(0, parser.Errors.Count);
+                Assert.IsNotNull(program);
+                Assert.AreEqual(1, program.Statements.Count);
+
+                ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+                Assert.IsNotNull(es);
+
+                PrefixExpression? num = es.Expression as PrefixExpression;
+                Assert.IsNotNull(num);
+            }
+        }
     }
 }

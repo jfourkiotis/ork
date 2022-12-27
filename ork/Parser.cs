@@ -9,6 +9,7 @@ namespace ork.parser
     public enum Precedence
     {
         Lowest,
+        Prefix
     }
 
     public sealed class Parser
@@ -20,8 +21,9 @@ namespace ork.parser
         {
             { TokenTag.Ident, p => p.ParseIdentifier() },
             { TokenTag.Int, p => p.ParseIntegerLiteral() },
+            { TokenTag.Bang, p => p.ParsePrefixExpression() },
+            { TokenTag.Minus, p => p.ParsePrefixExpression() }
         };
-
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public Parser(Lexer lexer)
@@ -81,6 +83,7 @@ namespace ork.parser
         {
             if (!prefixParseFns.TryGetValue(curToken.Tag, out PrefixParseFn? prefix))
             {
+                Errors.Add($"no prefix parse function for {curToken.Tag} found");
                 return null;
             }
 
@@ -144,6 +147,14 @@ namespace ork.parser
                 return null;
             }
             return new IntegerLiteral(curToken, val);
+        }
+
+        private IExpression? ParsePrefixExpression()
+        {
+            Token prefixTok = curToken; // "!" or "-"
+            NextToken();
+            var rhs = ParseExpression(Precedence.Prefix);
+            return rhs != null ? new PrefixExpression(prefixTok, rhs) : null;
         }
 
         private bool ExpectPeek(TokenTag tag)

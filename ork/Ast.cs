@@ -174,4 +174,22 @@ namespace ork.ast
             return token.Literal;
         }
     }
+
+    public sealed class PrefixExpression : IExpression
+    {
+        private readonly Token token; // the prefix token, e.g "!"
+        public PrefixExpression(Token token, IExpression rhs)
+        {
+            this.token = token;
+            Rhs = rhs;
+        }
+        public string TokenLiteral => token.Literal;
+        public IExpression Rhs { get; }
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+            sb.Append('(').Append(token.Literal).Append(Rhs).Append(')');
+            return sb.ToString();
+        }
+    }
 }
