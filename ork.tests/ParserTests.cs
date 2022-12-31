@@ -79,6 +79,15 @@ namespace ork.tests
             Assert.AreEqual("foobar", id.TokenLiteral);
         }
 
+        static void TestIntegerLiteral(IExpression? e, Int64 expectedValue)
+        {
+            Assert.IsNotNull(e);
+            IntegerLiteral? num = e as IntegerLiteral;
+            Assert.IsNotNull(num);
+            Assert.AreEqual(expectedValue.ToString(), num.TokenLiteral);
+            Assert.AreEqual(expectedValue, num.Value);
+        }
+
         [TestMethod]
         public void TestIntegerLiteralExpressions()
         {
@@ -94,10 +103,7 @@ namespace ork.tests
             ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
             Assert.IsNotNull(es);
 
-            IntegerLiteral? id = es.Expression as IntegerLiteral;
-            Assert.IsNotNull(id);
-
-            Assert.AreEqual("5", id.TokenLiteral);
+            TestIntegerLiteral(es.Expression, 5);
         }
 
         [TestMethod]
@@ -105,8 +111,8 @@ namespace ork.tests
         {
             var tests = new[]
             {
-                new {Input = "!5;", Operator = "!", Literal = "5"},
-                new {Input = "-5;", Operator = "-", Literal = "5"},
+                new {Input = "!5;", Operator = "!", Rhs = 5},
+                new {Input = "-5;", Operator = "-", Rhs = 5},
             };
 
             foreach (var test in tests)
@@ -123,6 +129,73 @@ namespace ork.tests
 
                 PrefixExpression? num = es.Expression as PrefixExpression;
                 Assert.IsNotNull(num);
+                Assert.AreEqual(test.Operator, num.TokenLiteral);
+                TestIntegerLiteral(num.Rhs, test.Rhs);
+            }
+        }
+
+        [TestMethod]
+        public void TestInfixExpressions()
+        {
+            var tests = new[]
+            {
+                new {Input = "5 + 5;", Lhs = 5, Operator = "+", Rhs = 5},
+                new {Input = "5 - 5;", Lhs = 5, Operator = "-", Rhs = 5},
+                new {Input = "5 * 5;", Lhs = 5, Operator = "*", Rhs = 5},
+                new {Input = "5 / 5;", Lhs = 5, Operator = "/", Rhs = 5},
+                new {Input = "5 > 5;", Lhs = 5, Operator = ">", Rhs = 5},
+                new {Input = "5 < 5;", Lhs = 5, Operator = "<", Rhs = 5},
+                new {Input = "5 == 5;", Lhs = 5, Operator = "==", Rhs = 5},
+                new {Input = "5 != 5;", Lhs = 5, Operator = "!=", Rhs = 5},
+            };
+            
+            foreach (var test in tests)
+            {
+                var lexer = new Lexer(test.Input);
+                var parser = new Parser(lexer);
+                var program = parser.ParseProgram();
+                Assert.AreEqual(0, parser.Errors.Count);
+                Assert.IsNotNull(program);
+                Assert.AreEqual(1, program.Statements.Count);
+
+                ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+                Assert.IsNotNull(es);
+
+                InfixExpression? ie = es.Expression as InfixExpression;
+                Assert.IsNotNull(ie);
+                Assert.AreEqual(test.Operator, ie.TokenLiteral);
+                TestIntegerLiteral(ie.Lhs, test.Lhs);
+                TestIntegerLiteral(ie.Rhs, test.Rhs);
+            }
+        }
+
+        [TestMethod]
+        public void TestOperatorPrecedence()
+        {
+            var tests = new[]
+            {
+                new { Input = "-a * b", Expected = "((-a) * b)" },
+                new { Input = "!-a", Expected = "(!(-a))" },
+                new { Input = "a + b + c", Expected = "((a + b) + c)" },
+                new { Input = "a + b - c", Expected = "((a + b) - c)" },
+                new { Input = "a * b * c", Expected = "((a * b) * c)" },
+                new { Input = "a * b / c", Expected = "((a * b) / c)" },
+                new { Input = "a + b / c", Expected = "(a + (b / c))" },
+                new { Input = "a + b * c + d / e - f", Expected = "(((a + (b * c)) + (d / e)) - f)" },
+                new { Input = "3 + 4; -5 * 5", Expected = "(3 + 4)((-5) * 5)" },
+                new { Input = "5 > 4 == 3 < 4", Expected = "((5 > 4) == (3 < 4))" },
+                new { Input = "5 < 4 != 3 > 4", Expected = "((5 < 4) != (3 > 4))" },
+                new { Input = "3 + 4 * 5 == 3 * 1 + 4 * 5", Expected = "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))" },
+            };
+
+            foreach (var test in tests)
+            {
+                var lexer = new Lexer(test.Input);
+                var parser = new Parser(lexer);
+                var program = parser.ParseProgram();
+                Assert.AreEqual(0, parser.Errors.Count);
+                Assert.IsNotNull(program);
+                Assert.AreEqual(test.Expected, program.ToString());
             }
         }
     }

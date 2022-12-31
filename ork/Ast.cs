@@ -192,4 +192,30 @@ namespace ork.ast
             return sb.ToString();
         }
     }
+    
+    public sealed class InfixExpression : IExpression
+    {
+        private readonly Token token; // the prefix token, e.g "!"
+        public InfixExpression(Token token, IExpression lhs, IExpression rhs)
+        {
+            this.token = token;
+            Lhs = lhs;
+            Rhs = rhs;
+        }
+        public string TokenLiteral => token.Literal;
+        public IExpression Lhs { get; }
+        public IExpression Rhs { get; }
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+            sb.Append('(');
+            sb.Append(Lhs);
+            sb.Append(' ');
+            sb.Append(token.Literal);
+            sb.Append(' ');
+            sb.Append(Rhs);
+            sb.Append(')');
+            return sb.ToString();
+        }
+    }
 }
