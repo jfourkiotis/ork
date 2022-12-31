@@ -70,25 +70,13 @@
 
         private void ReadChar()
         {
-            if (readPosition >= input.Length)
-            {
-                ch = Char.MinValue; // '\0'
-            } else
-            {
-                ch = input[readPosition];
-            }
+            ch = readPosition >= input.Length ? Char.MinValue : // '\0'
+                input[readPosition];
             position = readPosition;
             readPosition++;
         }
 
-        private char PeekNext()
-        {
-            if (readPosition >= input.Length)
-            {
-                return '\0';
-            }
-            return input[readPosition];
-        }
+        private char PeekNext() => readPosition >= input.Length ? Char.MinValue : input[readPosition];
 
         private Token ReadIdentifierOrKeyword(out bool readNext)
         {
@@ -101,12 +89,7 @@
             }
 
             var literal = input.Substring(pos, position - pos);
-
-            if (Keywords.TryGetValue(literal, out TokenTag keyTag))
-            {
-                return new Token(keyTag, literal);
-            }
-            return new Token(TokenTag.Ident, literal);
+            return Keywords.TryGetValue(literal, out TokenTag keyTag) ? new Token(keyTag, literal) : new Token(TokenTag.Ident, literal);
         }
 
         private Token ReadNumber(out bool readNext)
@@ -124,21 +107,15 @@
 
         private Token ReadAssignmentOrEq()
         {
-            if (PeekNext() == '=')
-            {
-                ReadChar();
-                return new Token(TokenTag.Eq, "==");
-            }
-            return new Token(TokenTag.Assign, "=");
+            if (PeekNext() != '=') return new Token(TokenTag.Assign, "=");
+            ReadChar();
+            return new Token(TokenTag.Eq, "==");
         }
         private Token ReadBangOrNotEq()
         {
-            if (PeekNext() == '=')
-            {
-                ReadChar();
-                return new Token(TokenTag.NotEq, "!=");
-            }
-            return new Token(TokenTag.Bang, "!");
+            if (PeekNext() != '=') return new Token(TokenTag.Bang, "!");
+            ReadChar();
+            return new Token(TokenTag.NotEq, "!=");
         }
     }
 }
