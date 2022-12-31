@@ -23,14 +23,16 @@ namespace ork.parser
         private readonly Lexer lexer;
         private Token curToken;
         private Token peekToken;
-        private readonly IDictionary<TokenTag, PrefixParseFn> prefixParseFns = new Dictionary<TokenTag, PrefixParseFn>()
+        private static readonly IDictionary<TokenTag, PrefixParseFn> PrefixParseFns =
+            new Dictionary<TokenTag, PrefixParseFn>()
         {
             { TokenTag.Ident, p => p.ParseIdentifier() },
             { TokenTag.Int, p => p.ParseIntegerLiteral() },
             { TokenTag.Bang, p => p.ParsePrefixExpression() },
             { TokenTag.Minus, p => p.ParsePrefixExpression() }
         };
-        private readonly IDictionary<TokenTag, InfixParseFn> infixParseFns = new Dictionary<TokenTag, InfixParseFn>()
+        private static readonly IDictionary<TokenTag, InfixParseFn> InfixParseFns =
+            new Dictionary<TokenTag, InfixParseFn>()
         {
             { TokenTag.Plus, (p, lhs) => p.ParseInfixExpression(lhs) },
             { TokenTag.Minus, (p, lhs) => p.ParseInfixExpression(lhs) },
@@ -67,7 +69,7 @@ namespace ork.parser
             Errors = new List<string>();
         }
 
-        public IList<string> Errors { get; private set; }
+        public IList<string> Errors { get; }
 
         public Program ParseProgram()
         {
@@ -110,7 +112,7 @@ namespace ork.parser
 
         private IExpression? ParseExpression(Precedence precedence)
         {
-            if (!prefixParseFns.TryGetValue(curToken.Tag, out PrefixParseFn? prefix))
+            if (!PrefixParseFns.TryGetValue(curToken.Tag, out PrefixParseFn? prefix))
             {
                 Errors.Add($"no prefix parse function for {curToken.Tag} found");
                 return null;
@@ -120,7 +122,7 @@ namespace ork.parser
 
             while (lhs != null && !PeekTokenIs(TokenTag.Semicolon) && precedence < PeekPrecedence())
             {
-                if (!infixParseFns.TryGetValue(peekToken.Tag, out InfixParseFn? infix))
+                if (!InfixParseFns.TryGetValue(peekToken.Tag, out InfixParseFn? infix))
                 {
                     return lhs;
                 }
