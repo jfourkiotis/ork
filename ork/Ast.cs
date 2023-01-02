@@ -24,21 +24,9 @@ namespace ork.ast
             Statements = statements.AsReadOnly();
         }
 
-        public IReadOnlyList<IStatement> Statements { get; private set; }
+        public IReadOnlyList<IStatement> Statements { get; }
 
-        public string TokenLiteral
-        {
-            get
-            {
-                if (Statements.Count == 0)
-                {
-                    return "";
-                } else
-                {
-                    return Statements[0].TokenLiteral;
-                }
-            }
-        }
+        public string TokenLiteral => Statements.Count == 0 ? "" : Statements[0].TokenLiteral;
 
         public override string ToString()
         {
