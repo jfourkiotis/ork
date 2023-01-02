@@ -87,6 +87,56 @@ namespace ork.tests
             Assert.AreEqual(expectedValue.ToString(), num.TokenLiteral);
             Assert.AreEqual(expectedValue, num.Value);
         }
+        
+        static void TestBooleanLiteral(IExpression? e, bool expectedValue)
+        {
+            Assert.IsNotNull(e);
+            switch (expectedValue)
+            {
+                case true:
+                {
+                    TrueLiteral? t = e as TrueLiteral;
+                    Assert.IsNotNull(t);
+                    Assert.AreEqual("true", t.TokenLiteral);
+                    break;
+                }
+                default:
+                {
+                    FalseLiteral? t = e as FalseLiteral;
+                    Assert.IsNotNull(t);
+                    Assert.AreEqual("false", t.TokenLiteral);
+                    break;
+                }
+            }
+        }
+
+        static void TestIdentifier(IExpression? e, string id)
+        {
+            Assert.IsNotNull(e);
+            Identifier? i = e as Identifier;
+            Assert.IsNotNull(i);
+            Assert.AreEqual(id, i.TokenLiteral);
+            Assert.AreEqual(id, i.ToString());
+        }
+
+        static void TestLiteral(IExpression? e, object expectedValue)
+        {
+            switch (expectedValue)
+            {
+                case long value:
+                    TestIntegerLiteral(e, value);
+                    break;
+                case bool value:
+                    TestBooleanLiteral(e, value);
+                    break;
+                case string id:
+                    TestIdentifier(e, id);
+                    break;
+                default:
+                    Assert.Fail("unexpected value");
+                    break;
+            }
+        }
 
         [TestMethod]
         public void TestIntegerLiteralExpressions()
@@ -134,19 +184,39 @@ namespace ork.tests
             }
         }
 
+        struct InfixTest
+        {
+            public InfixTest(string input, object lhs, string op, object rhs)
+            {
+                Input = input;
+                Lhs = lhs;
+                Operator = op;
+                Rhs = rhs;
+            }
+            
+            internal string Input { get;  }
+            internal object Lhs { get; }
+            internal string Operator { get; }
+            internal object Rhs { get; }
+        }
+
         [TestMethod]
         public void TestInfixExpressions()
         {
-            var tests = new[]
+            var tests = new InfixTest[]
             {
-                new {Input = "5 + 5;", Lhs = 5, Operator = "+", Rhs = 5},
-                new {Input = "5 - 5;", Lhs = 5, Operator = "-", Rhs = 5},
-                new {Input = "5 * 5;", Lhs = 5, Operator = "*", Rhs = 5},
-                new {Input = "5 / 5;", Lhs = 5, Operator = "/", Rhs = 5},
-                new {Input = "5 > 5;", Lhs = 5, Operator = ">", Rhs = 5},
-                new {Input = "5 < 5;", Lhs = 5, Operator = "<", Rhs = 5},
-                new {Input = "5 == 5;", Lhs = 5, Operator = "==", Rhs = 5},
-                new {Input = "5 != 5;", Lhs = 5, Operator = "!=", Rhs = 5},
+                new(input: "5 + 5;", lhs: 5L, op: "+", rhs: 5L),
+                new(input: "5 - 5;", lhs: 5L, op: "-", rhs: 5L),
+                new(input: "5 * 5;", lhs: 5L, op: "*", rhs: 5L),
+                new(input: "5 / 5;", lhs: 5L, op: "/", rhs: 5L),
+                new(input: "5 > 5;", lhs: 5L, op: ">", rhs: 5L),
+                new(input: "5 < 5;", lhs: 5L, op: "<", rhs: 5L),
+                new(input: "5 == 5;", lhs: 5L, op: "==", rhs: 5L),
+                new(input: "5 != 5;", lhs: 5L, op: "!=", rhs: 5L),
+                new(input: "true == true", lhs: true, op: "==", rhs: true),
+                new(input: "true != false", lhs: true, op: "!=", rhs: false),
+                new(input: "false == false", lhs: false, op: "==", rhs: false),
+                new(input: "alice * bob", lhs: "alice", op: "*", rhs: "bob"),
             };
             
             foreach (var test in tests)
@@ -164,8 +234,8 @@ namespace ork.tests
                 InfixExpression? ie = es.Expression as InfixExpression;
                 Assert.IsNotNull(ie);
                 Assert.AreEqual(test.Operator, ie.TokenLiteral);
-                TestIntegerLiteral(ie.Lhs, test.Lhs);
-                TestIntegerLiteral(ie.Rhs, test.Rhs);
+                TestLiteral(ie.Lhs, test.Lhs);
+                TestLiteral(ie.Rhs, test.Rhs);
             }
         }
 
