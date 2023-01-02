@@ -190,6 +190,9 @@ namespace ork.tests
                 new { Input = "false", Expected = "false" },
                 new { Input = "3 > 5 == false", Expected = "((3 > 5) == false)" },
                 new { Input = "3 < 5 == true", Expected = "((3 < 5) == true)" },
+                new { Input = "(5 + 5) * 2", Expected = "((5 + 5) * 2)" },
+                new { Input = "-(5 + 5)", Expected = "(-(5 + 5))" },
+                new { Input = "!(true == true)", Expected = "(!(true == true))" },
             };
 
             foreach (var test in tests)
