@@ -218,4 +218,20 @@ namespace ork.ast
             return sb.ToString();
         }
     }
+
+    public sealed class TrueLiteral : IExpression
+    {
+        private readonly Token token;
+        public TrueLiteral(Token token) => this.token = token;
+        public string TokenLiteral => token.Literal;
+        public override string ToString() => "true";
+    }
+    
+    public sealed class FalseLiteral : IExpression
+    {
+        private readonly Token token;
+        public FalseLiteral(Token token) => this.token = token;
+        public string TokenLiteral => token.Literal;
+        public override string ToString() => "false";
+    }
 }

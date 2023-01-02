@@ -29,7 +29,9 @@ namespace ork.parser
             { TokenTag.Ident, p => p.ParseIdentifier() },
             { TokenTag.Int, p => p.ParseIntegerLiteral() },
             { TokenTag.Bang, p => p.ParsePrefixExpression() },
-            { TokenTag.Minus, p => p.ParsePrefixExpression() }
+            { TokenTag.Minus, p => p.ParsePrefixExpression() },
+            { TokenTag.True, p => p.ParseBooleanLiteral() },
+            { TokenTag.False, p => p.ParseBooleanLiteral() },
         };
         private static readonly IDictionary<TokenTag, InfixParseFn> InfixParseFns =
             new Dictionary<TokenTag, InfixParseFn>()
@@ -208,6 +210,8 @@ namespace ork.parser
             var rhs = ParseExpression(precedence);
             return rhs != null ? new InfixExpression(infixTok, lhs, rhs) : null;
         }
+
+        private IExpression ParseBooleanLiteral() => CurTokenIs(TokenTag.True) ? new TrueLiteral(curToken) : new FalseLiteral(curToken);
 
         private Precedence CurPrecedence() => Precedences.TryGetValue(curToken.Tag, out Precedence val) ? val : Precedence.Lowest;
         private Precedence PeekPrecedence() => Precedences.TryGetValue(peekToken.Tag, out Precedence val) ? val : Precedence.Lowest;

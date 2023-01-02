@@ -186,6 +186,10 @@ namespace ork.tests
                 new { Input = "5 > 4 == 3 < 4", Expected = "((5 > 4) == (3 < 4))" },
                 new { Input = "5 < 4 != 3 > 4", Expected = "((5 < 4) != (3 > 4))" },
                 new { Input = "3 + 4 * 5 == 3 * 1 + 4 * 5", Expected = "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))" },
+                new { Input = "true", Expected = "true" },
+                new { Input = "false", Expected = "false" },
+                new { Input = "3 > 5 == false", Expected = "((3 > 5) == false)" },
+                new { Input = "3 < 5 == true", Expected = "((3 < 5) == true)" },
             };
 
             foreach (var test in tests)
