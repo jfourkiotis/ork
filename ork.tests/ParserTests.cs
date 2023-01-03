@@ -200,6 +200,15 @@ namespace ork.tests
             internal object Rhs { get; }
         }
 
+        void TestInfixExpression(IExpression? e, object lhs, string op, object rhs)
+        {
+            InfixExpression? ie = e as InfixExpression;
+            Assert.IsNotNull(ie);
+            Assert.AreEqual(op, ie.TokenLiteral);
+            TestLiteral(ie.Lhs, lhs);
+            TestLiteral(ie.Rhs, rhs);
+        }
+
         [TestMethod]
         public void TestInfixExpressions()
         {
@@ -230,12 +239,7 @@ namespace ork.tests
 
                 ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
                 Assert.IsNotNull(es);
-
-                InfixExpression? ie = es.Expression as InfixExpression;
-                Assert.IsNotNull(ie);
-                Assert.AreEqual(test.Operator, ie.TokenLiteral);
-                TestLiteral(ie.Lhs, test.Lhs);
-                TestLiteral(ie.Rhs, test.Rhs);
+                TestInfixExpression(es.Expression, test.Lhs, test.Operator, test.Rhs);
             }
         }
 
@@ -274,6 +278,66 @@ namespace ork.tests
                 Assert.IsNotNull(program);
                 Assert.AreEqual(test.Expected, program.ToString());
             }
+        }
+
+        [TestMethod]
+        public void TestIfExpression()
+        {
+            string input = "if (x < y) { x }";
+
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);
+            Assert.IsNotNull(program);
+            Assert.AreEqual(1, program.Statements.Count);
+
+            ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(es);
+            
+            IfExpression? ie = es.Expression as IfExpression;
+            Assert.IsNotNull(ie);
+            TestInfixExpression(ie.Condition, "x", "<", "y");
+            
+            Assert.AreEqual(1, ie.Then.Statements.Count);
+
+            ExpressionStatement? then0 = ie.Then.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(then0);
+            TestIdentifier(then0.Expression, "x");
+            Assert.IsNull(ie.Else);
+        }
+        
+        [TestMethod]
+        public void TestIfElseExpression()
+        {
+            string input = "if (x < y) { x } else { y }";
+
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);
+            Assert.IsNotNull(program);
+            Assert.AreEqual(1, program.Statements.Count);
+
+            ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(es);
+            
+            IfExpression? ie = es.Expression as IfExpression;
+            Assert.IsNotNull(ie);
+            TestInfixExpression(ie.Condition, "x", "<", "y");
+            
+            Assert.IsNotNull(ie.Then);
+            Assert.AreEqual(1, ie.Then.Statements.Count);
+
+            ExpressionStatement? then0 = ie.Then.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(then0);
+            TestIdentifier(then0.Expression, "x");
+            
+            Assert.IsNotNull(ie.Else);
+            Assert.AreEqual(1, ie.Else.Statements.Count);
+            ExpressionStatement? else0 = ie.Else.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(else0);
+            TestIdentifier(else0.Expression, "y");
         }
     }
 }

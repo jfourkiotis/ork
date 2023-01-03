@@ -33,6 +33,7 @@ namespace ork.parser
             { TokenTag.True, p => p.ParseBooleanLiteral() },
             { TokenTag.False, p => p.ParseBooleanLiteral() },
             { TokenTag.LParen, p => p.ParseGroupedExpression() },
+            { TokenTag.If, p => p.ParseIfExpression() },
         };
         private static readonly IDictionary<TokenTag, InfixParseFn> InfixParseFns =
             new Dictionary<TokenTag, InfixParseFn>()
@@ -219,6 +220,56 @@ namespace ork.parser
             NextToken();
             var e = ParseExpression(Precedence.Lowest);
             return ExpectPeek(TokenTag.RParen) ? e : null;
+        }
+
+        private IfExpression? ParseIfExpression()
+        {
+            Token ifToken = curToken;
+
+            if (!ExpectPeek(TokenTag.LParen))
+                return null;
+
+            NextToken();
+            var conditionExpression = ParseExpression(Precedence.Lowest);
+            if (conditionExpression == null)
+                return null;
+
+            if (!ExpectPeek(TokenTag.RParen))
+                return null;
+
+            if (!ExpectPeek(TokenTag.LBrace))
+                return null;
+
+            var thenBlock = ParseBlockStatement();
+
+            BlockStatement? elseBlock = null;
+            if (PeekTokenIs(TokenTag.Else))
+            {
+                NextToken();
+                if (!ExpectPeek(TokenTag.LBrace))
+                    return null;
+                elseBlock = ParseBlockStatement();
+            }
+
+            return new IfExpression(ifToken, conditionExpression, thenBlock, elseBlock);
+        }
+
+        private BlockStatement ParseBlockStatement()
+        {
+            Token braceToken = curToken; // '{'
+
+            NextToken();
+
+            var statements = new List<IStatement>();
+            while (!CurTokenIs(TokenTag.RBrace) && !CurTokenIs(TokenTag.Eof))
+            {
+                var stmt = ParseStatement();
+                if (stmt != null)
+                    statements.Add(stmt);
+                NextToken();
+            }
+
+            return new BlockStatement(braceToken, statements);
         }
         
         private Precedence CurPrecedence() => Precedences.TryGetValue(curToken.Tag, out Precedence val) ? val : Precedence.Lowest;

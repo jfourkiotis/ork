@@ -222,4 +222,61 @@ namespace ork.ast
         public string TokenLiteral => token.Literal;
         public override string ToString() => "false";
     }
+
+    public sealed class BlockStatement : IStatement
+    {
+        private readonly Token token; // the '{' token
+
+        public BlockStatement(Token token, IList<IStatement> statements)
+        {
+            this.token = token;
+            Statements = statements.AsReadOnly();
+        }
+        public IReadOnlyList<IStatement> Statements { get;  }
+        public string TokenLiteral => token.Literal;
+
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+            foreach (var s in Statements)
+            {
+                sb.Append(s);
+            }
+
+            return sb.ToString();
+        }
+    }
+
+    public sealed class IfExpression : IExpression
+    {
+        private readonly Token token; // 'if'
+
+        public IfExpression(Token token, IExpression condition, BlockStatement thenStatement,
+            BlockStatement? elseStatement)
+        {
+            this.token = token;
+            Condition = condition;
+            Then = thenStatement;
+            Else = elseStatement;
+        }
+
+        public string TokenLiteral => token.Literal;
+        public IExpression Condition { get; }
+        public BlockStatement Then { get;  }
+        public BlockStatement? Else { get; }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+
+            sb.Append("if");
+            sb.Append(Condition);
+            sb.Append(' ');
+            sb.Append(Then);
+            sb.Append("else ");
+            sb.Append(Else);
+            
+            return sb.ToString();
+        }
+    }
 }
