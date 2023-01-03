@@ -102,7 +102,7 @@ namespace ork.ast
             sb.Append(Name);
             sb.Append(" = ");
 
-            if (Expression != null)
+            if (Expression is not null)
             {
                 sb.Append(Expression);
             }
@@ -132,7 +132,7 @@ namespace ork.ast
             StringBuilder sb = new();
             sb.Append(token.Literal);
             
-            if (Expression != null) 
+            if (Expression is not null) 
             {
                 sb.Append(' ');
                 sb.Append(Expression);

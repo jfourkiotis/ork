@@ -82,7 +82,7 @@ namespace ork.parser
             while (curToken.Tag != TokenTag.Eof)
             {
                 IStatement? statement = ParseStatement();
-                if (statement != null)
+                if (statement is not null)
                 {
                     statements.Add(statement);
                 }
@@ -124,7 +124,7 @@ namespace ork.parser
 
             var lhs = prefix(this);
 
-            while (lhs != null && !PeekTokenIs(TokenTag.Semicolon) && precedence < PeekPrecedence())
+            while (lhs is not null && !PeekTokenIs(TokenTag.Semicolon) && precedence < PeekPrecedence())
             {
                 if (!InfixParseFns.TryGetValue(peekToken.Tag, out InfixParseFn? infix))
                 {
@@ -201,7 +201,7 @@ namespace ork.parser
             Token prefixTok = curToken; // "!" or "-"
             NextToken();
             var rhs = ParseExpression(Precedence.Prefix);
-            return rhs != null ? new PrefixExpression(prefixTok, rhs) : null;
+            return rhs is not null ? new PrefixExpression(prefixTok, rhs) : null;
         }
 
         private IExpression? ParseInfixExpression(IExpression lhs)
@@ -210,7 +210,7 @@ namespace ork.parser
             var precedence = CurPrecedence();
             NextToken();
             var rhs = ParseExpression(precedence);
-            return rhs != null ? new InfixExpression(infixTok, lhs, rhs) : null;
+            return rhs is not null ? new InfixExpression(infixTok, lhs, rhs) : null;
         }
 
         private IExpression ParseBooleanLiteral() => CurTokenIs(TokenTag.True) ? new TrueLiteral(curToken) : new FalseLiteral(curToken);
@@ -231,7 +231,7 @@ namespace ork.parser
 
             NextToken();
             var conditionExpression = ParseExpression(Precedence.Lowest);
-            if (conditionExpression == null)
+            if (conditionExpression is null)
                 return null;
 
             if (!ExpectPeek(TokenTag.RParen))
@@ -264,7 +264,7 @@ namespace ork.parser
             while (!CurTokenIs(TokenTag.RBrace) && !CurTokenIs(TokenTag.Eof))
             {
                 var stmt = ParseStatement();
-                if (stmt != null)
+                if (stmt is not null)
                     statements.Add(stmt);
                 NextToken();
             }

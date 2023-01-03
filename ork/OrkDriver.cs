@@ -17,7 +17,7 @@ internal static class OrkDriver
             Console.Write(">> ");
 
             var line = Console.ReadLine();
-            if (line == null)
+            if (line is null)
             {
                 break;
             }
