@@ -339,5 +339,32 @@ namespace ork.tests
             Assert.IsNotNull(else0);
             TestIdentifier(else0.Expression, "y");
         }
+
+        [TestMethod]
+        public void TestFunctionLiteralParsing()
+        {
+            string input = "fn(x, y) { x + y; }";
+            
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);
+            Assert.IsNotNull(program);
+            Assert.AreEqual(1, program.Statements.Count);
+
+            ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(es);
+            
+            FunctionLiteral? fl = es.Expression as FunctionLiteral;
+            Assert.IsNotNull(fl);
+            Assert.AreEqual(2, fl.Parameters.Count);
+            TestLiteral(fl.Parameters[0], "x");
+            TestLiteral(fl.Parameters[1], "y");
+            
+            Assert.AreEqual(1, fl.Body.Statements.Count);
+            ExpressionStatement? esb = fl.Body.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(esb);
+            TestInfixExpression(esb.Expression, "x", "+", "y");
+        }
     }
 }

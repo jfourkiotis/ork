@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.Text;
 
 using ork.tokens;
 
@@ -275,6 +276,32 @@ namespace ork.ast
             sb.Append(Then);
             sb.Append("else ");
             sb.Append(Else);
+            
+            return sb.ToString();
+        }
+    }
+
+    public sealed class FunctionLiteral : IExpression
+    {
+        private readonly Token token; // 'fn'
+
+        public FunctionLiteral(Token token, IList<Identifier> parameters, BlockStatement body)
+        {
+            this.token = token;
+            Parameters = parameters.AsReadOnly();
+            Body = body;
+        }
+        public BlockStatement Body { get; }
+        public ReadOnlyCollection<Identifier> Parameters { get; }
+        public string TokenLiteral => token.Literal;
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+            sb.Append("fn");
+            sb.Append('(');
+            sb.Append(String.Join(',', Parameters));
+            sb.Append(')');
+            sb.Append(Body);
             
             return sb.ToString();
         }

@@ -34,6 +34,7 @@ namespace ork.parser
             { TokenTag.False, p => p.ParseBooleanLiteral() },
             { TokenTag.LParen, p => p.ParseGroupedExpression() },
             { TokenTag.If, p => p.ParseIfExpression() },
+            { TokenTag.Function, p => p.ParseFunctionLiteral() },
         };
         private static readonly IDictionary<TokenTag, InfixParseFn> InfixParseFns =
             new Dictionary<TokenTag, InfixParseFn>()
@@ -271,7 +272,53 @@ namespace ork.parser
 
             return new BlockStatement(braceToken, statements);
         }
-        
+
+        private FunctionLiteral? ParseFunctionLiteral()
+        {
+            Token fnToken = curToken;
+
+            if (!ExpectPeek(TokenTag.LParen))
+                return null;
+
+            var parameters = ParseFunctionParameters();
+            if (parameters is null)
+                return null;
+
+            if (!ExpectPeek(TokenTag.LBrace))
+                return null;
+
+            var body = ParseBlockStatement();
+            return new FunctionLiteral(fnToken, parameters, body);
+        }
+
+        private IList<Identifier>? ParseFunctionParameters()
+        {
+            List<Identifier> parameters = new();
+
+            if (PeekTokenIs(TokenTag.RParen))
+            {
+                NextToken();
+                return parameters;
+            }
+
+            if (!ExpectPeek(TokenTag.Ident))
+                return null;
+            parameters.Add(new Identifier(curToken));
+
+            while (PeekTokenIs(TokenTag.Comma))
+            {
+                NextToken();
+                if (!ExpectPeek(TokenTag.Ident))
+                    return null;
+                parameters.Add(new Identifier(curToken));
+            }
+
+            if (!ExpectPeek(TokenTag.RParen))
+                return null;
+            
+            return parameters;
+        }
+
         private Precedence CurPrecedence() => Precedences.TryGetValue(curToken.Tag, out Precedence val) ? val : Precedence.Lowest;
         private Precedence PeekPrecedence() => Precedences.TryGetValue(peekToken.Tag, out Precedence val) ? val : Precedence.Lowest;
 
