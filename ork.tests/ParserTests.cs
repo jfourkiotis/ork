@@ -366,5 +366,34 @@ namespace ork.tests
             Assert.IsNotNull(esb);
             TestInfixExpression(esb.Expression, "x", "+", "y");
         }
+
+        [TestMethod]
+        public void TestFunctionParameterParsing()
+        {
+            var tests = new[]
+            {
+                new { Input = "fn(){}", Expected = Array.Empty<string>() },
+                new { Input = "fn(x){}", Expected = new[]{ "x" } }, 
+                new { Input = "fn(x, y, z){}", Expected = new[] { "x", "y", "z"} },
+            };
+
+            foreach (var test in tests)
+            {
+                var lexer = new Lexer(test.Input);
+                var parser = new Parser(lexer);
+                var program = parser.ParseProgram();
+                Assert.AreEqual(0, parser.Errors.Count);
+                Assert.IsNotNull(program);
+                Assert.AreEqual(1, program.Statements.Count);
+                
+                ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+                Assert.IsNotNull(es);
+                
+                FunctionLiteral? fl = es.Expression as FunctionLiteral;
+                Assert.IsNotNull(fl);
+
+                Assert.IsTrue(test.Expected.SequenceEqual(fl.Parameters.Select(p => p.ToString())));
+            }
+        }
     }
 }
