@@ -1,6 +1,6 @@
-﻿using ork.lexer;
+﻿using ork;
+using ork.lexer;
 using ork.parser;
-using ork.tokens;
 
 internal static class OrkDriver
 {
@@ -13,6 +13,7 @@ internal static class OrkDriver
 
     private static void Start()
     {
+        TreeWalkingInterpreter tw = new();
         do
         {
             Console.Write(">> ");
@@ -32,7 +33,10 @@ internal static class OrkDriver
                     Console.WriteLine(msg);
                 continue;
             }
-            Console.WriteLine(program);
+
+            var result = tw.Eval(program);
+            if (result is not null)
+                Console.WriteLine(result);
         } while (true);
     }
 }
