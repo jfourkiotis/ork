@@ -1,4 +1,5 @@
 ﻿using ork.lexer;
+using ork.parser;
 using ork.tokens;
 
 internal static class OrkDriver
@@ -23,12 +24,15 @@ internal static class OrkDriver
             }
 
             var lexer = new Lexer(line);
-            Token token;
-            do
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            if (parser.Errors.Count != 0)
             {
-                token = lexer.NextToken();
-                Console.WriteLine(token.ToString());
-            } while (token.Tag != TokenTag.Eof);
+                foreach (var msg in parser.Errors)
+                    Console.WriteLine(msg);
+                continue;
+            }
+            Console.WriteLine(program);
         } while (true);
     }
 }
