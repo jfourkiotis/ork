@@ -15,12 +15,26 @@ public class TreeWalkingInterpreterTest
         return tw.Eval(program);
     }
     [TestMethod]
-    public void TestIntegerExpression()
+    public void TestIntegerExpressions()
     {
         var tests = new[]
         {
             new { Input = "5", Output = 5L },
             new { Input = "10", Output = 10L },
+        };
+        foreach (var test in tests)
+        {
+            var result = TestEval(test.Input);
+            Assert.AreEqual(test.Output, result);
+        }
+    }
+    [TestMethod]
+    public void TestBooleanExpressions()
+    {
+        var tests = new[]
+        {
+            new { Input = "true", Output = true },
+            new { Input = "false", Output = false },
         };
         foreach (var test in tests)
         {

@@ -24,6 +24,10 @@ public sealed class TreeWalkingInterpreter
                 goto start;
             case IntegerLiteral val:
                 return val.Value;
+            case TrueLiteral:
+                return true;
+            case FalseLiteral:
+                return false;
         }
         return null;
     }
