@@ -268,6 +268,9 @@ namespace ork.tests
                 new { Input = "(5 + 5) * 2", Expected = "((5 + 5) * 2)" },
                 new { Input = "-(5 + 5)", Expected = "(-(5 + 5))" },
                 new { Input = "!(true == true)", Expected = "(!(true == true))" },
+                new { Input = "a + add(b * c) + d", Expected = "((a + add((b * c))) + d)" },
+                new { Input = "add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", Expected = "add(a,b,1,(2 * 3),(4 + 5),add(6,(7 * 8)))" },
+                new { Input = "add(a + b + c * d / f + g)", Expected = "add((((a + b) + ((c * d) / f)) + g))" },
             };
 
             foreach (var test in tests)
