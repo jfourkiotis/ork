@@ -1,6 +1,7 @@
 ﻿using ork.ast;
 using ork.lexer;
 using ork.tokens;
+using System.Runtime.CompilerServices;
 
 namespace ork.parser
 {
@@ -47,6 +48,7 @@ namespace ork.parser
             { TokenTag.NotEq, (p, lhs) => p.ParseInfixExpression(lhs) },
             { TokenTag.LessThan, (p, lhs) => p.ParseInfixExpression(lhs) },
             { TokenTag.GreaterThan, (p, lhs) => p.ParseInfixExpression(lhs) },
+            { TokenTag.LParen, (p, lhs) => p.ParseCallExpression(lhs) },
         };
 
         private static readonly IDictionary<TokenTag, Precedence> Precedences = new Dictionary<TokenTag, Precedence>()
@@ -59,6 +61,7 @@ namespace ork.parser
             { TokenTag.Minus, Precedence.Sum },
             { TokenTag.Asterisk, Precedence.Product },
             { TokenTag.Slash, Precedence.Product },
+            { TokenTag.LParen, Precedence.Call },
         };
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -317,6 +320,46 @@ namespace ork.parser
                 return null;
             
             return parameters;
+        }
+
+        private CallExpression? ParseCallExpression(IExpression lhs)
+        {
+            Token callToken = curToken;
+            var arguments = ParseCallArguments();
+            if (arguments is null) return null;
+            return new CallExpression(callToken, lhs, arguments);
+        }
+
+        private IList<IExpression>? ParseCallArguments()
+        {
+            List<IExpression> arguments = new();
+
+            if (PeekTokenIs(TokenTag.RParen))
+            {
+                NextToken();
+                return arguments;
+            }
+
+            NextToken();
+            IExpression? arg = ParseExpression(Precedence.Lowest);
+            if (arg is null)
+                return null;
+            arguments.Add(arg);
+
+            while (PeekTokenIs(TokenTag.Comma))
+            {
+                NextToken();
+                NextToken();
+                arg = ParseExpression(Precedence.Lowest);
+                if (arg is null) 
+                    return null;
+                arguments.Add(arg);
+            }
+
+            if (!ExpectPeek(TokenTag.RParen))
+                return null;
+
+            return arguments;
         }
 
         private Precedence CurPrecedence() => Precedences.TryGetValue(curToken.Tag, out Precedence val) ? val : Precedence.Lowest;

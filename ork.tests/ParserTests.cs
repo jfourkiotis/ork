@@ -1,6 +1,7 @@
 ﻿using ork.lexer;
 using ork.ast;
 using ork.parser;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ork.tests
 {
@@ -394,6 +395,31 @@ namespace ork.tests
 
                 Assert.IsTrue(test.Expected.SequenceEqual(fl.Parameters.Select(p => p.ToString())));
             }
+        }
+
+        [TestMethod]
+        public void TestCallExpressionParsing()
+        {
+            string input = "add(1, 2 * 3, 4 + 5);";
+
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);
+            Assert.IsNotNull(program);
+            Assert.AreEqual(1, program.Statements.Count);
+
+            ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(es);
+
+            CallExpression? fl = es.Expression as CallExpression;
+            Assert.IsNotNull(fl);
+
+            TestIdentifier(fl.Function, "add");
+            Assert.AreEqual(3, fl.Arguments.Count);
+            TestLiteral(fl.Arguments[0], 1L);
+            TestInfixExpression(fl.Arguments[1], 2L, "*", 3L);
+            TestInfixExpression(fl.Arguments[2], 4L, "+", 5L); 
         }
     }
 }

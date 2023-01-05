@@ -306,4 +306,32 @@ namespace ork.ast
             return sb.ToString();
         }
     }
+
+    public sealed class CallExpression : IExpression
+    {
+        private readonly Token token; // '('
+
+        public CallExpression(Token token, IExpression function, IList<IExpression> arguments)
+        {
+            this.token = token;
+            Function = function;
+            Arguments = arguments.AsReadOnly();
+        }
+
+        public string TokenLiteral => token.Literal;
+        public IExpression Function { get; }
+        public IReadOnlyList<IExpression> Arguments { get; }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+
+            sb.Append(Function);
+            sb.Append('(');
+            sb.Append(string.Join(',', Arguments));
+            sb.Append(')');
+
+            return sb.ToString();
+        }
+    }
 }
