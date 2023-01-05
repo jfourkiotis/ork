@@ -157,32 +157,32 @@ namespace ork.parser
                 return null;
             }
 
-            // TODO: consume all tokens until a semicolon is
-            // found
-            while (!CurTokenIs(TokenTag.Semicolon))
-            {
-                NextToken();
-            }
+            NextToken();
 
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            return new LetStatement(letToken, id, null);
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+            var expr = ParseExpression(Precedence.Lowest);
+            if (expr is null)
+                return null;
+
+            if (PeekTokenIs(TokenTag.Semicolon))
+                NextToken();
+
+            return new LetStatement(letToken, id, expr);
         }
 
-        private ReturnStatement ParseReturnStatement()
+        private ReturnStatement? ParseReturnStatement()
         {
             Token returnToken = curToken;
 
             NextToken(); // expression start
 
-            // TODO: consume all tokens until a semicolon is
-            // found
-            while (!CurTokenIs(TokenTag.Semicolon))
-            {
-                NextToken();
-            }
+            var expr = ParseExpression(Precedence.Lowest);
+            if (expr is null)
+                return null;
 
-            return new ReturnStatement(returnToken, null);
+            if (PeekTokenIs(TokenTag.Semicolon))
+                NextToken();
+
+            return new ReturnStatement(returnToken, expr);
         }
 
         private IExpression ParseIdentifier()

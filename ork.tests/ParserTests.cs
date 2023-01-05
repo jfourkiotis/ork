@@ -11,27 +11,28 @@ namespace ork.tests
         [TestMethod]
         public void TestLetStatements()
         {
-            string input = """
-                let x = 5;
-                let y = 10;
-                let foobar = 838383;
-                """;
-
-            var lexer = new Lexer(input);
-            var parser = new Parser(lexer);
-            var program = parser.ParseProgram();
-            Assert.AreEqual(0, parser.Errors.Count);
-            Assert.IsNotNull(program);
-            Assert.AreEqual(3, program.Statements.Count);
-
-            string[] tests = { "x", "y", "foobar" };
-            foreach (var (first, second) in tests.Zip(program.Statements)) 
+            var tests = new[]
             {
-                Assert.AreEqual("let", second.TokenLiteral);
-                
-                LetStatement? ls = second as LetStatement;
+                new { Input = "let x = 5;", ExpectedId = "x", ExpectedValue = (object)5L },
+                new { Input = "let y = true;", ExpectedId = "y", ExpectedValue = (object)true },
+                new { Input = "let foobar = y;", ExpectedId = "foobar", ExpectedValue = (object)"y" },
+            };
+
+            foreach (var test in tests)
+            {
+
+                var lexer = new Lexer(test.Input);
+                var parser = new Parser(lexer);
+                var program = parser.ParseProgram();
+                Assert.AreEqual(0, parser.Errors.Count);
+                Assert.IsNotNull(program);
+                Assert.AreEqual(1, program.Statements.Count);
+
+                LetStatement? ls = program.Statements[0] as LetStatement;
                 Assert.IsNotNull(ls);
-                Assert.AreEqual(first, ls.Name.TokenLiteral);
+
+                TestIdentifier(ls.Name, test.ExpectedId);
+                TestLiteral(ls.Expression, test.ExpectedValue);
             }
         }
 

@@ -78,16 +78,11 @@ namespace ork.ast
         // TokenTag.Let
         private readonly Token token;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public LetStatement(Token token, Identifier name, IExpression expression)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             this.token = token;
             Name = name;
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.\
-            // FIXME
             Expression = expression;
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         public Identifier Name { get; }
@@ -102,12 +97,7 @@ namespace ork.ast
             sb.Append(' ');
             sb.Append(Name);
             sb.Append(" = ");
-
-            if (Expression is not null)
-            {
-                sb.Append(Expression);
-            }
-
+            sb.Append(Expression);
             sb.Append(';');
             return sb.ToString();
         }
