@@ -48,8 +48,8 @@
                 '<' => new Token(TokenTag.LessThan, ch.ToString()),
                 '>' => new Token(TokenTag.GreaterThan, ch.ToString()),
                 '\0' => new Token(TokenTag.Eof, ""),
-                var _ when Char.IsLetter(ch) => ReadIdentifierOrKeyword(out readNext), 
-                var _ when Char.IsDigit(ch) => ReadNumber(out readNext),
+                _ when Char.IsLetter(ch) => ReadIdentifierOrKeyword(out readNext), 
+                _ when Char.IsDigit(ch) => ReadNumber(out readNext),
                 _ => throw new NotImplementedException($"{ch}"),
             };
 
