@@ -73,6 +73,31 @@ public sealed class TreeWalkingInterpreter
                 }
                 break;
             }
+            case IfExpression ifExpression:
+                var conditionResult = Eval(ifExpression.Condition);
+                if (conditionResult is null or false)
+                {
+                    if (ifExpression.Else is not null)
+                    {
+                        node = ifExpression.Else;
+                        goto start;
+                    }
+                }
+                else
+                {
+                    node = ifExpression.Then;
+                    goto start;
+                }
+
+                break;
+            case BlockStatement blockStatement:
+                object? blockResult = null;
+                foreach (var statement in blockStatement.Statements)
+                {
+                    blockResult = Eval(statement);
+                }
+
+                return blockResult;
             case IntegerLiteral val:
                 return val.Value;
             case TrueLiteral:

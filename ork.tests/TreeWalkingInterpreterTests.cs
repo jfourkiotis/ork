@@ -93,4 +93,25 @@ public class TreeWalkingInterpreterTest
             Assert.AreEqual(expected, (bool)result, input);
         }
     }
+
+    [TestMethod]
+    public void TestIfElseExpression()
+    {
+        var tests = new[]
+        {
+            ("if (true) { 10 }", (object)10L),
+            ("if (false) { 10 }", null),
+            ("if (1) { 10 }", (object)10L),
+            ("if (1 < 2) { 10 }", (object)10L),
+            ("if (1 > 2) { 10 }", null),
+            ("if (1 > 2) { 10 } else { 20 }", (object)20L),
+            ("if (1 < 2) { 10 } else { 20 }", (object)10L),
+        };
+
+        foreach (var (input, expected) in tests)
+        {
+            var result = TestEval(input);
+            Assert.AreEqual(expected, result);
+        }
+    }
 }
