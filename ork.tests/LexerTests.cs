@@ -35,26 +35,63 @@ namespace ork.tests
         }
 
         [TestMethod]
+        public void TestComments()
+        {
+            string input = "# hello world";
+            var lexer = new Lexer(input);
+            Assert.AreEqual(TokenTag.Eof, lexer.NextToken().Tag);
+        }
+        
+        [TestMethod]
+        public void TestCommentsWithSourceCode()
+        {
+            string input = """
+                #
+                # number of dogs
+                let y = 10;
+            """;
+            var tests = new[]
+            {
+                new { Tag = TokenTag.Let, ExpectedLiteral = "let" },
+                new { Tag = TokenTag.Ident, ExpectedLiteral = "y" },
+                new { Tag = TokenTag.Assign, ExpectedLiteral = "=" },
+                new { Tag = TokenTag.Int, ExpectedLiteral = "10" },
+                new { Tag = TokenTag.Semicolon, ExpectedLiteral = ";" },
+            };
+            
+            var lexer = new Lexer(input);
+            foreach (var test in tests)
+            {
+                var tok = lexer.NextToken();
+                Assert.AreEqual(test.Tag, tok.Tag);
+                Assert.AreEqual(test.ExpectedLiteral, tok.Literal);
+            }
+        }
+
+        [TestMethod]
         public void TestNextTokenComplex()
         {
             string input = """
-                let five = 5;
-
+                # five is an integer
+                let five = 5; # it is greater than 4 but less than 6
+                # ten is another integer
                 let ten = 10;
 
                 let add = fn(x, y) {
-                    x + y;
+                    x + y; # what a nice function
                 };
 
-                let result = add(five, ten);
+                let result = add(five, ten); # yeap
 
                 !-/*5;
                 5 < 10 > 5;
 
                 if (5 < 10) {
+                    # yes, this is correct
                     return true;
                 } else {
-                    return false;
+                    # this is also correct
+                    return false; # 123 but I don't like false
                 }
 
                     10 == 10; 

@@ -47,6 +47,7 @@
                 '!' => ReadBangOrNotEq(),
                 '<' => new Token(TokenTag.LessThan, ch.ToString()),
                 '>' => new Token(TokenTag.GreaterThan, ch.ToString()),
+                '#' => ConsumeCommentAndContinue(out readNext),
                 '\0' => new Token(TokenTag.Eof, ""),
                 _ when Char.IsLetter(ch) => ReadIdentifierOrKeyword(out readNext), 
                 _ when Char.IsDigit(ch) => ReadNumber(out readNext),
@@ -116,6 +117,14 @@
             if (PeekNext() != '=') return new Token(TokenTag.Bang, "!");
             ReadChar();
             return new Token(TokenTag.NotEq, "!=");
+        }
+
+        private Token ConsumeCommentAndContinue(out bool readNext)
+        {
+            readNext = false;
+            while (ch != '\n' && ch != Char.MinValue)
+                ReadChar();
+            return NextToken();
         }
     }
 }
