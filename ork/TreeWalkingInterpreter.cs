@@ -4,6 +4,8 @@ namespace ork;
 
 public sealed class TreeWalkingInterpreter
 {
+    private bool ret = false;
+    
     public object? Eval(INode node)
     {
         start:
@@ -14,6 +16,10 @@ public sealed class TreeWalkingInterpreter
                 foreach (var statement in program.Statements)
                 {
                     result = Eval(statement);
+                    if (ret)
+                    {
+                        return result;
+                    }
                 }
 
                 return result;
@@ -95,9 +101,22 @@ public sealed class TreeWalkingInterpreter
                 foreach (var statement in blockStatement.Statements)
                 {
                     blockResult = Eval(statement);
+                    if (ret)
+                    {
+                        return blockResult;
+                    }
                 }
 
                 return blockResult;
+            case ReturnStatement returnStatement:
+                object? returnValue = null;
+                if (returnStatement.Expression is not null)
+                {
+                    returnValue = Eval(returnStatement.Expression);
+                }
+                ret = true;
+                
+                return returnValue;
             case IntegerLiteral val:
                 return val.Value;
             case TrueLiteral:

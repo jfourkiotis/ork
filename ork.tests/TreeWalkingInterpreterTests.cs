@@ -114,4 +114,24 @@ public class TreeWalkingInterpreterTest
             Assert.AreEqual(expected, result);
         }
     }
+    
+    [TestMethod]
+    public void TestReturnStatement()
+    {
+        var tests = new[]
+        {
+            ("return 10;", 10L),
+            ("return 10; 9;", 10L),
+            ("return 2 * 5; 9;", 10L),
+            ("9; return 2 * 5; 9;", 10L),
+            ("if (10 > 1) { if (10 > 1) { return 10; } return 1 }", 10L),
+        };
+
+        foreach (var (input, expected) in tests)
+        {
+            var result = TestEval(input);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expected, (Int64)result);
+        }
+    }
 }
