@@ -1,15 +1,16 @@
 ﻿using ork;
 using ork.lexer;
 using ork.parser;
+using Environment = ork.Environment;
 
 internal static class OrkDriver
 {
     private static void Main()
     {
-        Console.WriteLine($"Hello {Environment.UserName}! This is the ORK programming language!");
+        Console.WriteLine($"Hello {System.Environment.UserName}! This is the ORK programming language!");
         Console.WriteLine("Feel free to type in commands");
 
-        var cliArgs = Environment.GetCommandLineArgs();
+        var cliArgs = System.Environment.GetCommandLineArgs();
         if (cliArgs.Length > 1) // assume the second argument is the script to execute
         {
             var script = File.ReadAllText(cliArgs[1]);
@@ -24,6 +25,7 @@ internal static class OrkDriver
     private static void RunPrompt()
     {
         TreeWalkingInterpreter tw = new();
+        Environment env = new Environment();
         do
         {
             Console.Write(">> ");
@@ -34,17 +36,18 @@ internal static class OrkDriver
                 break;
             }
 
-            Run(line, tw);
+            Run(line, tw, env);
         } while (true);
     }
 
     private static void RunFile(string contents)
     {
         TreeWalkingInterpreter tw = new();
-        Run(contents, tw);
+        Environment env = new Environment();
+        Run(contents, tw, env);
     }
 
-    private static void Run(string line, TreeWalkingInterpreter tw)
+    private static void Run(string line, TreeWalkingInterpreter tw, Environment env)
     {
         var lexer = new Lexer(line);
         var parser = new Parser(lexer);
@@ -59,7 +62,7 @@ internal static class OrkDriver
         try
         {
             var t0 = System.Diagnostics.Stopwatch.StartNew();
-            var result = tw.Eval(program);
+            var result = tw.Eval(program, env);
             t0.Stop();
             Console.WriteLine(result);
             Console.WriteLine($"[elapsed time: {t0.Elapsed.TotalMilliseconds}ms]");

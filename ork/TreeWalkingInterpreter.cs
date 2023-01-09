@@ -14,7 +14,7 @@ public sealed class TreeWalkingInterpreter
         _ => throw new NotImplementedException(),
     };
 
-    public object? Eval(INode node)
+    public object? Eval(INode node, Environment env)
     {
         start:
         switch (node)
@@ -23,7 +23,7 @@ public sealed class TreeWalkingInterpreter
                 object? result = null;
                 foreach (var statement in program.Statements)
                 {
-                    result = Eval(statement);
+                    result = Eval(statement, env);
                     if (ret)
                     {
                         return result;
@@ -36,9 +36,20 @@ public sealed class TreeWalkingInterpreter
                     return null;
                 node = expressionStatement.Expression;
                 goto start;
+            case LetStatement letStatement:
+                var value = Eval(letStatement.Expression, env);
+                env.Set(letStatement.Name.TokenLiteral, value);
+                break;
+            case Identifier id:
+                if (!env.TryGet(id.TokenLiteral, out object? idval))
+                {
+                    throw new OrkRuntimeException($"identifier not found: {id.TokenLiteral}");
+                }
+
+                return idval;
             case PrefixExpression prefixExpression:
             {
-                var rhs = Eval(prefixExpression.Rhs);
+                var rhs = Eval(prefixExpression.Rhs, env);
                 if (prefixExpression.TokenLiteral == "!")
                 {
                     return rhs switch
@@ -62,8 +73,8 @@ public sealed class TreeWalkingInterpreter
             }
             case InfixExpression infixExpression:
             {
-                var lhs = Eval(infixExpression.Lhs);
-                var rhs = Eval(infixExpression.Rhs);
+                var lhs = Eval(infixExpression.Lhs, env);
+                var rhs = Eval(infixExpression.Rhs, env);
                 if (lhs is long a && rhs is long b)
                 {
                     return infixExpression.TokenLiteral switch
@@ -99,7 +110,7 @@ public sealed class TreeWalkingInterpreter
                 
             }
             case IfExpression ifExpression:
-                var conditionResult = Eval(ifExpression.Condition);
+                var conditionResult = Eval(ifExpression.Condition, env);
                 if (conditionResult is null or false)
                 {
                     if (ifExpression.Else is not null)
@@ -119,7 +130,7 @@ public sealed class TreeWalkingInterpreter
                 object? blockResult = null;
                 foreach (var statement in blockStatement.Statements)
                 {
-                    blockResult = Eval(statement);
+                    blockResult = Eval(statement, env);
                     if (ret)
                     {
                         return blockResult;
@@ -131,7 +142,7 @@ public sealed class TreeWalkingInterpreter
                 object? returnValue = null;
                 if (returnStatement.Expression is not null)
                 {
-                    returnValue = Eval(returnStatement.Expression);
+                    returnValue = Eval(returnStatement.Expression, env);
                 }
                 ret = true;
                 

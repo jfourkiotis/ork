@@ -12,7 +12,7 @@ public class TreeWalkingInterpreterTest
         var parser = new Parser(lexer);
         var program = parser.ParseProgram();
         var tw = new TreeWalkingInterpreter();
-        return tw.Eval(program);
+        return tw.Eval(program, new Environment());
     }
     [TestMethod]
     public void TestIntegerExpressions()
@@ -134,6 +134,25 @@ public class TreeWalkingInterpreterTest
             Assert.AreEqual(expected, (Int64)result);
         }
     }
+    
+    [TestMethod]
+    public void TestLetStatement()
+    {
+        var tests = new[]
+        {
+            ("let a = 5; a;", 5L),
+            ("let a = 5 * 5; a;", 25L),
+            ("let a = 5; let b = a; b;", 5L),
+            ("let a = 5; let b = a; let c = a + b + 5; c;", 15L),
+        };
+
+        foreach (var (input, expected) in tests)
+        {
+            var result = TestEval(input);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expected, (Int64)result);
+        }
+    }
 
     [TestMethod]
     public void TestErrorHandling()
@@ -145,6 +164,7 @@ public class TreeWalkingInterpreterTest
             ("-true", "unknown operator: -BOOLEAN"),
             ("true + false", "unknown operator: BOOLEAN + BOOLEAN"),
             ("if (10 > 1) { true + false ; }", "unknown operator: BOOLEAN + BOOLEAN"),
+            ("foobar;", "identifier not found: foobar"),
         };
 
         foreach (var (input, expected) in tests)
