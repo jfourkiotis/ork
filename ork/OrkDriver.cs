@@ -56,11 +56,17 @@ internal static class OrkDriver
             return;
         }
 
-	    var t0 = System.Diagnostics.Stopwatch.StartNew();
-        var result = tw.Eval(program);
-	    t0.Stop();
-        if (result is null) return;
-        Console.WriteLine(result);
-        Console.WriteLine($"[elapsed time: {t0.Elapsed.TotalMilliseconds}ms]");
+        try
+        {
+            var t0 = System.Diagnostics.Stopwatch.StartNew();
+            var result = tw.Eval(program);
+            t0.Stop();
+            Console.WriteLine(result);
+            Console.WriteLine($"[elapsed time: {t0.Elapsed.TotalMilliseconds}ms]");
+        }
+        catch (OrkRuntimeException e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }

@@ -134,4 +134,23 @@ public class TreeWalkingInterpreterTest
             Assert.AreEqual(expected, (Int64)result);
         }
     }
+
+    [TestMethod]
+    public void TestErrorHandling()
+    {
+        var tests = new[]
+        {
+            ("5 + true;", "type mismatch: INTEGER + BOOLEAN"),
+            ("5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"),
+            ("-true", "unknown operator: -BOOLEAN"),
+            ("true + false", "unknown operator: BOOLEAN + BOOLEAN"),
+            ("if (10 > 1) { true + false ; }", "unknown operator: BOOLEAN + BOOLEAN"),
+        };
+
+        foreach (var (input, expected) in tests)
+        {
+            var ex = Assert.ThrowsException<OrkRuntimeException>(() => TestEval(input));
+            Assert.AreEqual(expected, ex.Message);
+        }
+    }
 }

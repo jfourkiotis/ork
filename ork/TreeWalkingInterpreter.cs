@@ -5,7 +5,15 @@ namespace ork;
 public sealed class TreeWalkingInterpreter
 {
     private bool ret = false;
-    
+
+    private string TypeName(object? o) => o switch
+    {
+        long => "INTEGER",
+        bool => "BOOLEAN",
+        null => "NIL",
+        _ => throw new NotImplementedException(),
+    };
+
     public object? Eval(INode node)
     {
         start:
@@ -45,10 +53,12 @@ public sealed class TreeWalkingInterpreter
                     return rhs switch
                     {
                         Int64 val => -val,
-                        _ => null,
+                        _ => throw new OrkRuntimeException(
+                            $"unknown operator: {prefixExpression.TokenLiteral}{TypeName(rhs)}"),
                     };
                 }
-                break;
+                throw new OrkRuntimeException($"unknown operator: {prefixExpression.TokenLiteral}{TypeName(rhs)}");
+                
             }
             case InfixExpression infixExpression:
             {
@@ -66,7 +76,8 @@ public sealed class TreeWalkingInterpreter
                         "<" => a < b,
                         "==" => a == b,
                         "!=" => a != b,
-                        _ => null,
+                        _ => throw new OrkRuntimeException(
+                            $"unknown operator: {TypeName(a)} {infixExpression.TokenLiteral} {TypeName(b)}"),
                     };
                 } else if (lhs is bool b1 && rhs is bool b2)
                 {
@@ -74,10 +85,18 @@ public sealed class TreeWalkingInterpreter
                     {
                         "==" => b1 == b2,
                         "!=" => b1 != b2,
-                        _ => null,
+                        _ => throw new OrkRuntimeException(
+                            $"unknown operator: {TypeName(lhs)} {infixExpression.TokenLiteral} {TypeName(rhs)}"),
                     };
+                } else if (lhs?.GetType() != rhs?.GetType())
+                {
+                    throw new OrkRuntimeException(
+                        $"type mismatch: {TypeName(lhs)} {infixExpression.TokenLiteral} {TypeName(rhs)}");
                 }
-                break;
+  
+                throw new OrkRuntimeException(
+                        $"unknown operator: {TypeName(lhs)} {infixExpression.TokenLiteral} {TypeName(rhs)}");
+                
             }
             case IfExpression ifExpression:
                 var conditionResult = Eval(ifExpression.Condition);
