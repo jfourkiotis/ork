@@ -2,7 +2,7 @@ namespace ork;
 
 public class Environment
 {
-    private readonly IDictionary<string, object?> store = new Dictionary<string, object?>();
+    private readonly Dictionary<string, object?> store = new();
     private readonly Environment? parent;
 
 
