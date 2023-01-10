@@ -147,6 +147,24 @@ public sealed class TreeWalkingInterpreter
                 ret = true;
                 
                 return returnValue;
+            case FunctionLiteral functionLiteral:
+                return new Function(functionLiteral.Parameters, functionLiteral.Body, env);
+            case CallExpression callExpression:
+                var fn = Eval(callExpression.Function, env);
+                if (fn is not Function function)
+                    throw new OrkRuntimeException($"not a function: {TypeName(fn)}");
+
+                // prepare environment
+                Environment fenv = new Environment(env);
+                int index = 0;
+                foreach (var v in callExpression.Arguments)
+                {
+                    fenv.Set(function.Parameters[index].TokenLiteral, Eval(v, env));
+                    index++;
+                }
+                node = function.Body;
+                env = fenv;
+                goto start;
             case IntegerLiteral val:
                 return val.Value;
             case TrueLiteral:
