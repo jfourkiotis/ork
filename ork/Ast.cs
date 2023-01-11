@@ -214,6 +214,19 @@ namespace ork.ast
         public override string ToString() => "false";
     }
 
+    public sealed class StringLiteral : IExpression
+    {
+        private readonly Token token;
+
+        public StringLiteral(Token token)
+        {
+            this.token = token;
+        }
+
+        public string TokenLiteral => token.Literal;
+        public override string ToString() => token.Literal;
+    }
+
     public sealed class BlockStatement : IStatement
     {
         private readonly Token token; // the '{' token

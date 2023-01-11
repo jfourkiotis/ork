@@ -96,6 +96,8 @@ namespace ork.tests
 
                     10 == 10; 
                 10 != 9;
+                "foobar"
+                "foo bar"
                 """;
 
             var tests = new[]
@@ -180,6 +182,8 @@ namespace ork.tests
                 new { Tag = TokenTag.NotEq, ExpectedLiteral = "!=" },
                 new { Tag = TokenTag.Int, ExpectedLiteral = "9"},
                 new { Tag = TokenTag.Semicolon, ExpectedLiteral = ";" },
+                new { Tag = TokenTag.String, ExpectedLiteral = "foobar" },
+                new { Tag = TokenTag.String, ExpectedLiteral = "foo bar" },
             };
 
             Lexer lexer = new Lexer(input);

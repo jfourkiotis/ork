@@ -11,6 +11,7 @@ public sealed class TreeWalkingInterpreter
         long => "INTEGER",
         bool => "BOOLEAN",
         null => "NIL",
+        string => "STRING",
         _ => throw new NotImplementedException(),
     };
 
@@ -89,6 +90,14 @@ public sealed class TreeWalkingInterpreter
                         "!=" => a != b,
                         _ => throw new OrkRuntimeException(
                             $"unknown operator: {TypeName(a)} {infixExpression.TokenLiteral} {TypeName(b)}"),
+                    };
+                } else if (lhs is string s1 && rhs is string s2)
+                {
+                    return infixExpression.TokenLiteral switch
+                    {
+                        "+" => s1 + s2,
+                        _ => throw new OrkRuntimeException(
+                            $"unknown operator: {TypeName(s1)} {infixExpression.TokenLiteral} {TypeName(s2)}"),
                     };
                 } else if (lhs is bool b1 && rhs is bool b2)
                 {
@@ -171,6 +180,8 @@ public sealed class TreeWalkingInterpreter
                 return true;
             case FalseLiteral:
                 return false;
+            case StringLiteral stringLiteral:
+                return stringLiteral.TokenLiteral;
         }
         return null;
     }

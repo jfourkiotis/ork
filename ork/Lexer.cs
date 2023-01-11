@@ -48,6 +48,7 @@
                 '<' => new Token(TokenTag.LessThan, ch.ToString()),
                 '>' => new Token(TokenTag.GreaterThan, ch.ToString()),
                 '#' => ConsumeCommentAndContinue(out readNext),
+                '"' => ReadString(),
                 '\0' => new Token(TokenTag.Eof, ""),
                 _ when Char.IsLetter(ch) => ReadIdentifierOrKeyword(out readNext), 
                 _ when Char.IsDigit(ch) => ReadNumber(out readNext),
@@ -125,6 +126,19 @@
             while (ch != '\n' && ch != Char.MinValue)
                 ReadChar();
             return NextToken();
+        }
+
+        private Token ReadString()
+        {
+            var pos = position + 1;
+            while (true)
+            {
+                ReadChar();
+                if (ch == '"' || ch == Char.MinValue)
+                    break;
+            }
+
+            return new Token(TokenTag.String, input.Substring(pos, position - pos));
         }
     }
 }

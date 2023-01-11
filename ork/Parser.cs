@@ -36,6 +36,7 @@ namespace ork.parser
             { TokenTag.LParen, p => p.ParseGroupedExpression() },
             { TokenTag.If, p => p.ParseIfExpression() },
             { TokenTag.Function, p => p.ParseFunctionLiteral() },
+            { TokenTag.String, p => p.ParseStringLiteral() },
         };
         private static readonly IDictionary<TokenTag, InfixParseFn> InfixParseFns =
             new Dictionary<TokenTag, InfixParseFn>()
@@ -188,6 +189,11 @@ namespace ork.parser
         private IExpression ParseIdentifier()
         {
             return new Identifier(curToken);
+        }
+
+        private IExpression ParseStringLiteral()
+        {
+            return new ork.ast.StringLiteral(curToken);
         }
 
         private IExpression? ParseIntegerLiteral()

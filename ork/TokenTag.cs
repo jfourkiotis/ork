@@ -7,6 +7,7 @@
         // identifiers + literals
         Ident,
         Int,
+        String,
         // operators
         Assign,
         Plus,
@@ -45,6 +46,7 @@
             TokenTag.Eof => "eof",
             TokenTag.Ident => "ident",
             TokenTag.Int => "int",
+            TokenTag.String => "string",
             TokenTag.Assign => "=",
             TokenTag.Plus => "+",
             TokenTag.Comma => ",",

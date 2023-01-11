@@ -1,3 +1,4 @@
+using ork.ast;
 using ork.lexer;
 using ork.parser;
 
@@ -193,5 +194,16 @@ public class TreeWalkingInterpreterTest
             Assert.IsNotNull(result);
             Assert.AreEqual(expected, (Int64)result);
         }
+    }
+
+    [TestMethod]
+    public void TestStringConcatenation()
+    {
+        string input = """
+            "hello" + " " + "world!"
+        """;
+        var result = TestEval(input);
+        Assert.IsNotNull(result);
+        Assert.AreEqual("hello world!", result);
     }
 }
