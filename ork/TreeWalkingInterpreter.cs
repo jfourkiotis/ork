@@ -164,7 +164,7 @@ public sealed class TreeWalkingInterpreter
                     throw new OrkRuntimeException($"not a function: {TypeName(fn)}");
 
                 // prepare environment
-                Environment fenv = new Environment(env);
+                Environment fenv = new Environment(function.Environment);
                 int index = 0;
                 foreach (var v in callExpression.Arguments)
                 {
