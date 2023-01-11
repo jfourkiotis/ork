@@ -3,11 +3,11 @@ using ork.builtins;
 
 namespace ork;
 
-using static ork.Object;
+using static Object;
 
 public sealed class TreeWalkingInterpreter
 {
-    private bool ret = false;
+    private bool ret;
 
     public object? Eval(INode node, Environment env)
     {

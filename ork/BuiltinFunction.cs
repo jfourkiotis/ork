@@ -1,6 +1,6 @@
 namespace ork.builtins;
 
-using static ork.Object;
+using static Object;
 using BuiltinFunction = Func<object?[], object?>;
 
 public static class Builtin
