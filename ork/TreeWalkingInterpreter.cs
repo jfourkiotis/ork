@@ -1,19 +1,13 @@
 using ork.ast;
+using ork.builtins;
 
 namespace ork;
+
+using static ork.Object;
 
 public sealed class TreeWalkingInterpreter
 {
     private bool ret = false;
-
-    private string TypeName(object? o) => o switch
-    {
-        long => "INTEGER",
-        bool => "BOOLEAN",
-        null => "NIL",
-        string => "STRING",
-        _ => throw new NotImplementedException(),
-    };
 
     public object? Eval(INode node, Environment env)
     {
@@ -42,12 +36,14 @@ public sealed class TreeWalkingInterpreter
                 env.Set(letStatement.Name.TokenLiteral, value);
                 break;
             case Identifier id:
-                if (!env.TryGet(id.TokenLiteral, out object? idval))
+                if (env.TryGet(id.TokenLiteral, out object? idval))
                 {
-                    throw new OrkRuntimeException($"identifier not found: {id.TokenLiteral}");
+                    return idval;
+                } else if (Builtin.Functions.TryGetValue(id.TokenLiteral, out var f))
+                {
+                    return f;
                 }
-
-                return idval;
+                throw new OrkRuntimeException($"identifier not found: {id.TokenLiteral}");
             case PrefixExpression prefixExpression:
             {
                 var rhs = Eval(prefixExpression.Rhs, env);
@@ -160,20 +156,24 @@ public sealed class TreeWalkingInterpreter
                 return new Function(functionLiteral.Parameters, functionLiteral.Body, env);
             case CallExpression callExpression:
                 var fn = Eval(callExpression.Function, env);
-                if (fn is not Function function)
-                    throw new OrkRuntimeException($"not a function: {TypeName(fn)}");
-
-                // prepare environment
-                Environment fenv = new Environment(function.Environment);
-                int index = 0;
-                foreach (var v in callExpression.Arguments)
+                switch (fn)
                 {
-                    fenv.Set(function.Parameters[index].TokenLiteral, Eval(v, env));
-                    index++;
+                    case Function f:
+                        Environment fenv = new Environment(f.Environment);
+                        int index1 = 0;
+                        foreach (var v in callExpression.Arguments)
+                        {
+                            fenv.Set(f.Parameters[index1].TokenLiteral, Eval(v, env));
+                            index1++;
+                        }
+                        node = f.Body;
+                        env = fenv;
+                        goto start;
+                    case Func<object?[], object?> b:
+                        return b(callExpression.Arguments.Select(a => Eval(a, env)).ToArray());
+                    default:
+                        throw new OrkRuntimeException($"not a function: {TypeName(fn)}");
                 }
-                node = function.Body;
-                env = fenv;
-                goto start;
             case IntegerLiteral val:
                 return val.Value;
             case TrueLiteral:

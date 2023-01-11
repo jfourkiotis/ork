@@ -206,4 +206,37 @@ public class TreeWalkingInterpreterTest
         Assert.IsNotNull(result);
         Assert.AreEqual("hello world!", result);
     }
+
+    [TestMethod]
+    public void TestBuiltinFunction()
+    {
+        var tests = new[]
+        {
+            ("""len("")""", 0L),
+            ("""len("four")""", 4L),
+            ("""len("hello world")""", 11L),
+        };
+
+        foreach (var (input, expected) in tests)
+        {
+            var result = TestEval(input);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(expected, result);
+        }
+    }
+    [TestMethod]
+    public void TestBuiltinFunctionErrors()
+    {
+        var tests = new[]
+        {
+            ("""len(1)""", (object)"argument to `len` not supported, got INTEGER"),
+            ("""len("one", "two")""", (object)"wrong number of arguments, got=2, want=1"),
+        };
+
+        foreach (var (input, expected) in tests)
+        {
+            var ex = Assert.ThrowsException<OrkRuntimeException>(() => TestEval(input));
+            Assert.AreEqual(expected, ex.Message);
+        }
+    }
 }
