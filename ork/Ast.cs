@@ -8,12 +8,12 @@ namespace ork.ast
 {
     public abstract class Node
     {
-        public Node(Token token)
+        protected Node(Token token)
         {
             Token = token;
         }
 
-        public Token Token { get; init; }
+        public Token Token { get; }
         public string TokenLiteral => Token.Literal;
     }
 

@@ -26,7 +26,7 @@ public sealed class TreeWalkingInterpreter
         return result;
     }
 
-    public object? Eval(Node node, Environment env)
+    private object? Eval(Node node, Environment env)
     {
         start:
         switch (node)
