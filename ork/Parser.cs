@@ -5,8 +5,8 @@ using System.Runtime.CompilerServices;
 
 namespace ork.parser
 {
-    using PrefixParseFn = Func<Parser, IExpression?>;
-    using InfixParseFn = Func<Parser, IExpression, IExpression?>;
+    using PrefixParseFn = Func<Parser, Expression?>;
+    using InfixParseFn = Func<Parser, Expression, Expression?>;
 
     public enum Precedence
     {
@@ -82,11 +82,11 @@ namespace ork.parser
 
         public Program ParseProgram()
         {
-            IList<IStatement> statements = new List<IStatement>();
+            IList<Statement> statements = new List<Statement>();
 
             while (curToken.Tag != TokenTag.Eof)
             {
-                IStatement? statement = ParseStatement();
+                Statement? statement = ParseStatement();
                 if (statement is not null)
                 {
                     statements.Add(statement);
@@ -97,7 +97,7 @@ namespace ork.parser
             return new Program(statements);
         }
 
-        private IStatement? ParseStatement() => curToken.Tag switch
+        private Statement? ParseStatement() => curToken.Tag switch
         {
             TokenTag.Let => ParseLetStatement(),
             TokenTag.Return => ParseReturnStatement(),
@@ -119,7 +119,7 @@ namespace ork.parser
             return new ExpressionStatement(token, expression);
         }
 
-        private IExpression? ParseExpression(Precedence precedence)
+        private Expression? ParseExpression(Precedence precedence)
         {
             if (!PrefixParseFns.TryGetValue(curToken.Tag, out PrefixParseFn? prefix))
             {
@@ -186,17 +186,17 @@ namespace ork.parser
             return new ReturnStatement(returnToken, expr);
         }
 
-        private IExpression ParseIdentifier()
+        private Expression ParseIdentifier()
         {
             return new Identifier(curToken);
         }
 
-        private IExpression ParseStringLiteral()
+        private Expression ParseStringLiteral()
         {
             return new ork.ast.StringLiteral(curToken);
         }
 
-        private IExpression? ParseIntegerLiteral()
+        private Expression? ParseIntegerLiteral()
         {
             if (!Int64.TryParse(curToken.Literal, out Int64 val))
             {
@@ -206,7 +206,7 @@ namespace ork.parser
             return new IntegerLiteral(curToken, val);
         }
 
-        private IExpression? ParsePrefixExpression()
+        private Expression? ParsePrefixExpression()
         {
             Token prefixTok = curToken; // "!" or "-"
             NextToken();
@@ -214,7 +214,7 @@ namespace ork.parser
             return rhs is not null ? new PrefixExpression(prefixTok, rhs) : null;
         }
 
-        private IExpression? ParseInfixExpression(IExpression lhs)
+        private Expression? ParseInfixExpression(Expression lhs)
         {
             Token infixTok = curToken; // "+", "-", etc
             var precedence = CurPrecedence();
@@ -223,9 +223,9 @@ namespace ork.parser
             return rhs is not null ? new InfixExpression(infixTok, lhs, rhs) : null;
         }
 
-        private IExpression ParseBooleanLiteral() => CurTokenIs(TokenTag.True) ? new TrueLiteral(curToken) : new FalseLiteral(curToken);
+        private Expression ParseBooleanLiteral() => CurTokenIs(TokenTag.True) ? new TrueLiteral(curToken) : new FalseLiteral(curToken);
 
-        private IExpression? ParseGroupedExpression()
+        private Expression? ParseGroupedExpression()
         {
             NextToken();
             var e = ParseExpression(Precedence.Lowest);
@@ -270,7 +270,7 @@ namespace ork.parser
 
             NextToken();
 
-            var statements = new List<IStatement>();
+            var statements = new List<Statement>();
             while (!CurTokenIs(TokenTag.RBrace) && !CurTokenIs(TokenTag.Eof))
             {
                 var stmt = ParseStatement();
@@ -328,7 +328,7 @@ namespace ork.parser
             return parameters;
         }
 
-        private CallExpression? ParseCallExpression(IExpression lhs)
+        private CallExpression? ParseCallExpression(Expression lhs)
         {
             Token callToken = curToken;
             var arguments = ParseCallArguments();
@@ -336,9 +336,9 @@ namespace ork.parser
             return new CallExpression(callToken, lhs, arguments);
         }
 
-        private IList<IExpression>? ParseCallArguments()
+        private IList<Expression>? ParseCallArguments()
         {
-            List<IExpression> arguments = new();
+            List<Expression> arguments = new();
 
             if (PeekTokenIs(TokenTag.RParen))
             {
@@ -347,7 +347,7 @@ namespace ork.parser
             }
 
             NextToken();
-            IExpression? arg = ParseExpression(Precedence.Lowest);
+            Expression? arg = ParseExpression(Precedence.Lowest);
             if (arg is null)
                 return null;
             arguments.Add(arg);

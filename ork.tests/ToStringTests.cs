@@ -8,7 +8,7 @@ namespace ork.tests
         [TestMethod]
         public void TestProgramToString()
         {
-            var program = new Program(new List<IStatement>()
+            var program = new Program(new List<Statement>()
             {
                 new LetStatement(new tokens.Token(tokens.TokenTag.Let, "let"), new Identifier(new tokens.Token(tokens.TokenTag.Ident, "myVar")), new Identifier(new tokens.Token(tokens.TokenTag.Ident, "anotherVar"))),
             });

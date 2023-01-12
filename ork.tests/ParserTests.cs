@@ -81,7 +81,7 @@ namespace ork.tests
             Assert.AreEqual("foobar", id.TokenLiteral);
         }
 
-        static void TestIntegerLiteral(IExpression? e, Int64 expectedValue)
+        static void TestIntegerLiteral(Expression? e, Int64 expectedValue)
         {
             Assert.IsNotNull(e);
             IntegerLiteral? num = e as IntegerLiteral;
@@ -90,7 +90,7 @@ namespace ork.tests
             Assert.AreEqual(expectedValue, num.Value);
         }
         
-        static void TestBooleanLiteral(IExpression? e, bool expectedValue)
+        static void TestBooleanLiteral(Expression? e, bool expectedValue)
         {
             Assert.IsNotNull(e);
             switch (expectedValue)
@@ -112,7 +112,7 @@ namespace ork.tests
             }
         }
 
-        static void TestIdentifier(IExpression? e, string id)
+        static void TestIdentifier(Expression? e, string id)
         {
             Assert.IsNotNull(e);
             Identifier? i = e as Identifier;
@@ -121,7 +121,7 @@ namespace ork.tests
             Assert.AreEqual(id, i.ToString());
         }
 
-        static void TestLiteral(IExpression? e, object expectedValue)
+        static void TestLiteral(Expression? e, object expectedValue)
         {
             switch (expectedValue)
             {
@@ -202,7 +202,7 @@ namespace ork.tests
             internal object Rhs { get; }
         }
 
-        void TestInfixExpression(IExpression? e, object lhs, string op, object rhs)
+        void TestInfixExpression(Expression? e, object lhs, string op, object rhs)
         {
             InfixExpression? ie = e as InfixExpression;
             Assert.IsNotNull(ie);

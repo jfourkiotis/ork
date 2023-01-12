@@ -5,27 +5,40 @@ using ork.tokens;
 
 namespace ork.ast
 {
-    public interface INode
+    public abstract class Node
     {
-        public string TokenLiteral { get; }
+        public Node(Token token)
+        {
+            Token = token;
+        }
+
+        public Token Token { get; init; }
+        public string TokenLiteral => Token.Literal;
     }
 
-    public interface IStatement : INode
+    public abstract class Statement : Node
     {
+        protected Statement(Token token) : base(token)
+        {
+        }
     }
 
-    public interface IExpression : INode
+    public abstract class Expression : Node
     {
+        protected Expression(Token token) : base(token)
+        {
+        }
     }
 
-    public sealed class Program : INode
+    // Program is not an AST node
+    public sealed class Program
     {
-        public Program(IList<IStatement> statements)
+        public Program(IList<Statement> statements)
         {
             Statements = statements.AsReadOnly();
         }
 
-        public IReadOnlyList<IStatement> Statements { get; }
+        public IReadOnlyList<Statement> Statements { get; }
 
         public string TokenLiteral => Statements.Count == 0 ? "" : Statements[0].TokenLiteral;
 
@@ -40,60 +53,44 @@ namespace ork.ast
         }
     }
 
-    public sealed class ExpressionStatement : IStatement
-    {
-        private readonly Token token;
-      
-        public ExpressionStatement(Token token, IExpression? expression)
+    public sealed class ExpressionStatement : Statement
+    {      
+        public ExpressionStatement(Token token, Expression? expression) : base(token) 
         {
-            this.token = token;
             Expression = expression;
         }
 
-        public string TokenLiteral => token.Literal;
-        public IExpression? Expression { get; }
-
+        public Expression? Expression { get; }
 
         public override string ToString() => Expression?.ToString() ?? "";
     }
 
-    public sealed class Identifier : IExpression
+    public sealed class Identifier : Expression
     {
-        private readonly Token token;
-
-        public Identifier(Token token) {
-            this.token = token;
+        public Identifier(Token token) : base(token)
+        {
         }
-
-        public string TokenLiteral => token.Literal;
 
         public override string ToString()
         {
-            return token.Literal;
+            return Token.Literal;
         }
     }
 
-    public sealed class LetStatement : IStatement
+    public sealed class LetStatement : Statement
     {
-        // TokenTag.Let
-        private readonly Token token;
-
-        public LetStatement(Token token, Identifier name, IExpression expression)
+        public LetStatement(Token token, Identifier name, Expression expression) : base(token)
         {
-            this.token = token;
             Name = name;
             Expression = expression;
         }
 
         public Identifier Name { get; }
-        public IExpression Expression { get; }
-
-        public string TokenLiteral => token.Literal;
-
+        public Expression Expression { get; }
         public override string ToString()
         {
             StringBuilder sb = new();
-            sb.Append(token.Literal);
+            sb.Append(Token.Literal);
             sb.Append(' ');
             sb.Append(Name);
             sb.Append(" = ");
@@ -103,25 +100,18 @@ namespace ork.ast
         }
     }
 
-    public sealed class ReturnStatement : IStatement
+    public sealed class ReturnStatement : Statement
     {
-        // TokenTag.Return
-        private readonly Token token;
-
-        public ReturnStatement(Token token, IExpression? expression)
+        public ReturnStatement(Token token, Expression? expression) : base(token)
         {
-            this.token = token;
             Expression = expression;
         }
 
-        public IExpression? Expression { get; }
-
-        public string TokenLiteral => token.Literal;
-
+        public Expression? Expression { get; }
         public override string? ToString()
         {
             StringBuilder sb = new();
-            sb.Append(token.Literal);
+            sb.Append(Token.Literal);
             
             if (Expression is not null) 
             {
@@ -134,63 +124,51 @@ namespace ork.ast
         }
     }
 
-    public sealed class IntegerLiteral : IExpression
+    public sealed class IntegerLiteral : Expression
     {
-        private readonly Token token;
-
-        public IntegerLiteral(Token token, Int64 val)
+        public IntegerLiteral(Token token, Int64 val) : base(token)
         {
-            this.token = token;
             Value = val;
         }
 
         public Int64 Value { get; }
-
-        public string TokenLiteral => token.Literal;
-
         public override string ToString()
         {
-            return token.Literal;
+            return Token.Literal;
         }
     }
 
-    public sealed class PrefixExpression : IExpression
+    public sealed class PrefixExpression : Expression
     {
-        private readonly Token token; // the prefix token, e.g "!"
-        public PrefixExpression(Token token, IExpression rhs)
-        {
-            this.token = token;
-            Rhs = rhs;
+        public PrefixExpression(Token token, Expression rhs) : base(token) 
+        { 
+            Rhs = rhs; 
         }
-        public string TokenLiteral => token.Literal;
-        public IExpression Rhs { get; }
+        public Expression Rhs { get; }
         public override string ToString()
         {
             StringBuilder sb = new();
-            sb.Append('(').Append(token.Literal).Append(Rhs).Append(')');
+            sb.Append('(').Append(Token.Literal).Append(Rhs).Append(')');
             return sb.ToString();
         }
     }
     
-    public sealed class InfixExpression : IExpression
+    public sealed class InfixExpression : Expression
     {
-        private readonly Token token; // the prefix token, e.g "!"
-        public InfixExpression(Token token, IExpression lhs, IExpression rhs)
+        public InfixExpression(Token token, Expression lhs, Expression rhs) : base(token)
         {
-            this.token = token;
             Lhs = lhs;
             Rhs = rhs;
         }
-        public string TokenLiteral => token.Literal;
-        public IExpression Lhs { get; }
-        public IExpression Rhs { get; }
+        public Expression Lhs { get; }
+        public Expression Rhs { get; }
         public override string ToString()
         {
             StringBuilder sb = new();
             sb.Append('(');
             sb.Append(Lhs);
             sb.Append(' ');
-            sb.Append(token.Literal);
+            sb.Append(Token.Literal);
             sb.Append(' ');
             sb.Append(Rhs);
             sb.Append(')');
@@ -198,47 +176,41 @@ namespace ork.ast
         }
     }
 
-    public sealed class TrueLiteral : IExpression
+    public sealed class TrueLiteral : Expression
     {
-        private readonly Token token;
-        public TrueLiteral(Token token) => this.token = token;
-        public string TokenLiteral => token.Literal;
+        public TrueLiteral(Token token) : base(token)
+        {
+
+        }
         public override string ToString() => "true";
     }
     
-    public sealed class FalseLiteral : IExpression
+    public sealed class FalseLiteral : Expression
     {
-        private readonly Token token;
-        public FalseLiteral(Token token) => this.token = token;
-        public string TokenLiteral => token.Literal;
+        public FalseLiteral(Token token) : base(token)
+        {
+
+        }
         public override string ToString() => "false";
     }
 
-    public sealed class StringLiteral : IExpression
+    public sealed class StringLiteral : Expression
     {
-        private readonly Token token;
-
-        public StringLiteral(Token token)
+        public StringLiteral(Token token) : base(token)
         {
-            this.token = token;
+
         }
 
-        public string TokenLiteral => token.Literal;
-        public override string ToString() => token.Literal;
+        public override string ToString() => Token.Literal;
     }
 
-    public sealed class BlockStatement : IStatement
+    public sealed class BlockStatement : Statement
     {
-        private readonly Token token; // the '{' token
-
-        public BlockStatement(Token token, IList<IStatement> statements)
+        public BlockStatement(Token token, IList<Statement> statements) : base(token)
         {
-            this.token = token;
             Statements = statements.AsReadOnly();
         }
-        public IReadOnlyList<IStatement> Statements { get;  }
-        public string TokenLiteral => token.Literal;
-
+        public IReadOnlyList<Statement> Statements { get;  }
         public override string ToString()
         {
             StringBuilder sb = new();
@@ -251,21 +223,17 @@ namespace ork.ast
         }
     }
 
-    public sealed class IfExpression : IExpression
+    public sealed class IfExpression : Expression
     {
-        private readonly Token token; // 'if'
-
-        public IfExpression(Token token, IExpression condition, BlockStatement thenStatement,
-            BlockStatement? elseStatement)
+        public IfExpression(Token token, Expression condition, BlockStatement thenStatement,
+            BlockStatement? elseStatement) : base(token)
         {
-            this.token = token;
             Condition = condition;
             Then = thenStatement;
             Else = elseStatement;
         }
 
-        public string TokenLiteral => token.Literal;
-        public IExpression Condition { get; }
+        public Expression Condition { get; }
         public BlockStatement Then { get;  }
         public BlockStatement? Else { get; }
 
@@ -284,19 +252,15 @@ namespace ork.ast
         }
     }
 
-    public sealed class FunctionLiteral : IExpression
+    public sealed class FunctionLiteral : Expression
     {
-        private readonly Token token; // 'fn'
-
-        public FunctionLiteral(Token token, IList<Identifier> parameters, BlockStatement body)
+        public FunctionLiteral(Token token, IList<Identifier> parameters, BlockStatement body) : base(token)
         {
-            this.token = token;
             Parameters = parameters.AsReadOnly();
             Body = body;
         }
         public BlockStatement Body { get; }
         public ReadOnlyCollection<Identifier> Parameters { get; }
-        public string TokenLiteral => token.Literal;
         public override string ToString()
         {
             StringBuilder sb = new();
@@ -310,20 +274,16 @@ namespace ork.ast
         }
     }
 
-    public sealed class CallExpression : IExpression
+    public sealed class CallExpression : Expression
     {
-        private readonly Token token; // '('
-
-        public CallExpression(Token token, IExpression function, IList<IExpression> arguments)
+        public CallExpression(Token token, Expression function, IList<Expression> arguments) : base(token)
         {
-            this.token = token;
             Function = function;
             Arguments = arguments.AsReadOnly();
         }
 
-        public string TokenLiteral => token.Literal;
-        public IExpression Function { get; }
-        public IReadOnlyList<IExpression> Arguments { get; }
+        public Expression Function { get; }
+        public IReadOnlyList<Expression> Arguments { get; }
 
         public override string ToString()
         {

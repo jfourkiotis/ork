@@ -9,23 +9,26 @@ public sealed class TreeWalkingInterpreter
 {
     private bool ret;
 
-    public object? Eval(INode node, Environment env)
+    public object? Eval(Program program, Environment env)
+    {
+        object? result = null;
+        foreach (var statement in program.Statements)
+        {
+            result = Eval(statement, env);
+            if (ret)
+            {
+                return result;
+            }
+        }
+
+        return result;
+    }
+
+    public object? Eval(Node node, Environment env)
     {
         start:
         switch (node)
         {
-            case Program program:
-                object? result = null;
-                foreach (var statement in program.Statements)
-                {
-                    result = Eval(statement, env);
-                    if (ret)
-                    {
-                        return result;
-                    }
-                }
-
-                return result;
             case ExpressionStatement expressionStatement:
                 if (expressionStatement.Expression is null)
                     return null;
