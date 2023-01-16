@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace ork;
 
 public static class Object
@@ -9,7 +11,7 @@ public static class Object
         null => "NIL",
         string => "STRING",
         Func<object?[], object?> => "BUILTIN",
-        List<object?> => "ARRAY",
+        ImmutableArray<object?> => "ARRAY",
         _ => throw new NotImplementedException(),
     };
 
@@ -20,7 +22,7 @@ public static class Object
         null => "nil",
         string s => s,
         Func<object?[], object?> => "builtin",
-        List<object?> l => "[" + String.Join(", ", l) + "]",
+        ImmutableArray<object?> l => "[" + String.Join(", ", l) + "]",
         _ => throw new NotImplementedException(),
     };
 }

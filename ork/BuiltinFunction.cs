@@ -1,5 +1,6 @@
 namespace ork.builtins;
 
+using System.Collections.Immutable;
 using static Object;
 using BuiltinFunction = Func<object?[], object?>;
 
@@ -14,7 +15,7 @@ public static class Builtin
             return args[0] switch
             {
                 string s => (long)s.Length,
-                List<object?> l => (long)l.Count,
+                ImmutableArray<object?> l => (long)l.Length,
                 _ => throw new OrkRuntimeException($"argument to `len` not supported, got {TypeName(args[0])}"),
             };
         } },
@@ -24,7 +25,7 @@ public static class Builtin
                 throw new OrkRuntimeException($"wrong number of arguments, got={args.Length}, want=1");
             return args[0] switch
             {
-                List<object?> l => l.Count > 0 ? l[0] : null,
+                ImmutableArray<object?> l => l.Length > 0 ? l[0] : null,
                 _ => throw new OrkRuntimeException($"argument to `first` must be ARRAY, got {TypeName(args[0])}"),
             };
         } },
@@ -34,7 +35,7 @@ public static class Builtin
                 throw new OrkRuntimeException($"wrong number of arguments, got={args.Length}, want=1");
             return args[0] switch
             {
-                List<object?> l => l.Count > 0 ? l[l.Count - 1] : null,
+                ImmutableArray<object?> l => l.Length > 0 ? l[^1] : null,
                 _ => throw new OrkRuntimeException($"argument to `last` must be ARRAY, got {TypeName(args[0])}"),
             };
         } },
@@ -44,7 +45,7 @@ public static class Builtin
                 throw new OrkRuntimeException($"wrong number of arguments, got={args.Length}, want=1");
             return args[0] switch
             {
-                List<object?> l => l.Skip(1).ToList(),
+                ImmutableArray<object?> l => l[1..],
                 _ => throw new OrkRuntimeException($"argument to `last` must be ARRAY, got {TypeName(args[0])}"),
             };
         } },

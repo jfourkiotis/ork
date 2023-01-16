@@ -1,5 +1,6 @@
 using ork.ast;
 using ork.builtins;
+using System.Collections.Immutable;
 
 namespace ork;
 
@@ -180,9 +181,9 @@ public sealed class TreeWalkingInterpreter
             case IndexExpression indexExpression:
                 var left = Eval(indexExpression.Left, env);
                 var index = Eval(indexExpression.Index, env);
-                if (left is List<object?> l && index is long i)
+                if (left is ImmutableArray<object?> l && index is long i)
                 {
-                    if (i < 0 || i > l.Count - 1)
+                    if (i < 0 || i > l.Length - 1)
                         return null;
                     return l[(int)i]; // TODO
                 }
@@ -196,7 +197,7 @@ public sealed class TreeWalkingInterpreter
             case StringLiteral stringLiteral:
                 return stringLiteral.TokenLiteral;
             case ArrayLiteral arrayLiteral:
-                return arrayLiteral.Elements.Select(a => Eval(a, env)).ToList();
+                return arrayLiteral.Elements.Select(a => Eval(a, env)).ToImmutableArray();
         }
         return null;
     }

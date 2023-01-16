@@ -242,11 +242,13 @@ public class TreeWalkingInterpreterTest
     [TestMethod]
     public void TestArrayIndexExpressions()
     {
-        var tests = new[]
+        (string, object?)[] tests = new[]
         {
-            ("[1, 2, 3][0]", 1L),
+            ("[1, 2, 3][0]", (object)1L),
             ("[1, 2, 3][1]", 2L),
             ("[1, 2, 3][2]", 3L),
+            ("let i = 0; [1][i];", 1L),
+            ("[1, 2, 3][-1]", null),
         };
         
         foreach (var (input, expected) in tests)
