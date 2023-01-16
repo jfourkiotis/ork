@@ -49,5 +49,13 @@ public static class Builtin
                 _ => throw new OrkRuntimeException($"argument to `last` must be ARRAY, got {TypeName(args[0])}"),
             };
         } },
+        { "puts", args =>
+        {
+            foreach (var a in args)
+            {
+                Console.WriteLine(Object.ToString(a));
+            }
+            return null;
+        } },
     };
 }
