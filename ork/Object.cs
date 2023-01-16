@@ -12,6 +12,7 @@ public static class Object
         string => "STRING",
         Func<object?[], object?> => "BUILTIN",
         ImmutableArray<object?> => "ARRAY",
+        ImmutableDictionary<object, object?> => "HASH",
         _ => throw new NotImplementedException(),
     };
 
@@ -23,6 +24,7 @@ public static class Object
         string s => s,
         Func<object?[], object?> => "builtin",
         ImmutableArray<object?> l => "[" + String.Join(", ", l) + "]",
+        ImmutableDictionary<object, object?> d => "{" + String.Join(", ", d.Select(kv => ToString(kv.Key) + " : " + ToString(kv.Value)).ToList()) + "}",
         _ => throw new NotImplementedException(),
     };
 }

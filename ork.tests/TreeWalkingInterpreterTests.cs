@@ -257,4 +257,18 @@ public class TreeWalkingInterpreterTest
             Assert.AreEqual(expected, v);
         }
     }
+    [TestMethod]    
+    public void TestHashIndexExpressions()
+    {
+        var tests = new[]
+        {
+            ("""{"foo": 5}["foo"]""", 5L),
+        };
+
+        foreach (var (input, expected) in tests)
+        {
+            var v = TestEval(input);
+            Assert.AreEqual(expected, v);
+        }
+    }
 }
