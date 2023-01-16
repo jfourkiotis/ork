@@ -9,6 +9,18 @@ public static class Object
         null => "NIL",
         string => "STRING",
         Func<object?[], object?> => "BUILTIN",
+        List<object?> => "ARRAY",
+        _ => throw new NotImplementedException(),
+    };
+
+    public static string ToString(object? o) => o switch
+    {
+        long l => l.ToString(),
+        bool a => a.ToString(),
+        null => "nil",
+        string s => s,
+        Func<object?[], object?> => "builtin",
+        List<object?> l => "[" + String.Join(", ", l) + "]",
         _ => throw new NotImplementedException(),
     };
 }

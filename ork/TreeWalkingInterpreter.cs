@@ -177,6 +177,16 @@ public sealed class TreeWalkingInterpreter
                     default:
                         throw new OrkRuntimeException($"not a function: {TypeName(fn)}");
                 }
+            case IndexExpression indexExpression:
+                var left = Eval(indexExpression.Left, env);
+                var index = Eval(indexExpression.Index, env);
+                if (left is List<object?> l && index is long i)
+                {
+                    if (i < 0 || i > l.Count - 1)
+                        return null;
+                    return l[(int)i]; // TODO
+                }
+                throw new OrkRuntimeException($"index operator not supported: {TypeName(left)}");
             case IntegerLiteral val:
                 return val.Value;
             case TrueLiteral:
@@ -185,6 +195,8 @@ public sealed class TreeWalkingInterpreter
                 return false;
             case StringLiteral stringLiteral:
                 return stringLiteral.TokenLiteral;
+            case ArrayLiteral arrayLiteral:
+                return arrayLiteral.Elements.Select(a => Eval(a, env)).ToList();
         }
         return null;
     }

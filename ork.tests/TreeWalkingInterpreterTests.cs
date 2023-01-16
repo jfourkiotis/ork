@@ -239,4 +239,20 @@ public class TreeWalkingInterpreterTest
             Assert.AreEqual(expected, ex.Message);
         }
     }
+    [TestMethod]
+    public void TestArrayIndexExpressions()
+    {
+        var tests = new[]
+        {
+            ("[1, 2, 3][0]", 1L),
+            ("[1, 2, 3][1]", 2L),
+            ("[1, 2, 3][2]", 3L),
+        };
+        
+        foreach (var (input, expected) in tests)
+        {
+            var v = TestEval(input);
+            Assert.AreEqual(expected, v);
+        }
+    }
 }

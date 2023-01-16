@@ -64,7 +64,7 @@ internal static class OrkDriver
             var t0 = System.Diagnostics.Stopwatch.StartNew();
             var result = tw.Eval(program, env);
             t0.Stop();
-            Console.WriteLine(result);
+            Console.WriteLine(ork.Object.ToString(result));
             Console.WriteLine($"[elapsed time: {t0.Elapsed.TotalMilliseconds}ms]");
         }
         catch (OrkRuntimeException e)
