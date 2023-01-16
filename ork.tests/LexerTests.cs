@@ -9,7 +9,7 @@ namespace ork.tests
         [TestMethod]
         public void TestNextTokenSimple()
         {
-            const string input = "=+(){},;[]";
+            const string input = "=+(){},;[]:";
 
             var tests = new[]
             {
@@ -23,6 +23,7 @@ namespace ork.tests
                 new { Tag = TokenTag.Semicolon, ExpectedLiteral = ";" },
                 new { Tag = TokenTag.LBracket, ExpectedLiteral = "[" },
                 new { Tag = TokenTag.RBracket, ExpectedLiteral = "]" },
+                new { Tag = TokenTag.Colon, ExpectedLiteral = ":" },
                 new { Tag = TokenTag.Eof, ExpectedLiteral = "" },
             };
 
@@ -100,7 +101,8 @@ namespace ork.tests
                 10 != 9;
                 "foobar"
                 "foo bar"
-                [1, 2]
+                [1, 2];
+                {"foo": "bar"};
                 """;
 
             var tests = new[]
@@ -192,6 +194,13 @@ namespace ork.tests
                 new { Tag = TokenTag.Comma, ExpectedLiteral = "," },
                 new { Tag = TokenTag.Int, ExpectedLiteral = "2" },
                 new { Tag = TokenTag.RBracket, ExpectedLiteral = "]" },
+                new { Tag = TokenTag.Semicolon, ExpectedLiteral = ";" },
+                new { Tag = TokenTag.LBrace, ExpectedLiteral = "{" },
+                new { Tag = TokenTag.String, ExpectedLiteral = "foo" },
+                new { Tag = TokenTag.Colon, ExpectedLiteral = ":" },
+                new { Tag = TokenTag.String, ExpectedLiteral = "bar" },
+                new { Tag = TokenTag.RBrace, ExpectedLiteral = "}" },
+                new { Tag = TokenTag.Semicolon, ExpectedLiteral = ";" },
             };
 
             Lexer lexer = new Lexer(input);

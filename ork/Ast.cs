@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Text;
 
 using ork.tokens;
@@ -339,6 +340,26 @@ namespace ork.ast
             sb.Append(Index);
             sb.Append(']');
             sb.Append(')');
+
+            return sb.ToString();
+        }
+    }
+
+    public sealed class HashLiteral : Expression
+    {
+        public HashLiteral(Token token, IDictionary<Expression, Expression?> pairs) : base(token) 
+        {
+            Pairs = pairs.ToImmutableDictionary();
+        }
+
+        public ImmutableDictionary<Expression, Expression?> Pairs { get; }
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+
+            sb.Append('{');
+            sb.Append(String.Join(',', Pairs.Select(p => p.Key + ":" + p.Value)));
+            sb.Append('}');
 
             return sb.ToString();
         }

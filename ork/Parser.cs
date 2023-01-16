@@ -39,6 +39,7 @@ namespace ork.parser
             { TokenTag.If, p => p.ParseIfExpression() },
             { TokenTag.Function, p => p.ParseFunctionLiteral() },
             { TokenTag.String, p => p.ParseStringLiteral() },
+            { TokenTag.LBrace, p => p.ParseHashLiteral() },
         };
         private static readonly IDictionary<TokenTag, InfixParseFn> InfixParseFns =
             new Dictionary<TokenTag, InfixParseFn>()
@@ -198,6 +199,38 @@ namespace ork.parser
         private Expression ParseStringLiteral()
         {
             return new ork.ast.StringLiteral(curToken);
+        }
+
+        private Expression? ParseHashLiteral()
+        {
+            Token hashTok = curToken;
+            Dictionary<Expression, Expression?> pairs = new();
+
+            while (!PeekTokenIs(TokenTag.RBrace))
+            {
+                NextToken();
+                var key = ParseExpression(Precedence.Lowest);
+                if (key is null)
+                    throw new OrkRuntimeException($"A key may not be NULL");
+
+                if (!ExpectPeek(TokenTag.Colon))
+                {
+                    return null;
+                }
+
+                NextToken();
+                var value = ParseExpression(Precedence.Lowest);
+                pairs.Add(key, value);
+
+                if (!PeekTokenIs(TokenTag.RBrace) && !ExpectPeek(TokenTag.Comma))
+                {
+                    return null;
+                }
+            }
+
+            if (!ExpectPeek(TokenTag.RBrace))
+                return null;
+            return new HashLiteral(hashTok, pairs);
         }
 
         private Expression? ParseIntegerLiteral()

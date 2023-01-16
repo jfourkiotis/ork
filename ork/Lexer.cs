@@ -35,6 +35,7 @@
             {
                 '=' => ReadAssignmentOrEq(),
                 ';' => new Token(TokenTag.Semicolon, ch.ToString()),
+                ':' => new Token(TokenTag.Colon, ch.ToString()),
                 '(' => new Token(TokenTag.LParen, ch.ToString()),
                 ')' => new Token(TokenTag.RParen, ch.ToString()),
                 '{' => new Token(TokenTag.LBrace, ch.ToString()),

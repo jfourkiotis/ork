@@ -22,6 +22,7 @@
         // delimiters
         Comma,
         Semicolon,
+        Colon,
 
         LParen,
         RParen,
@@ -53,6 +54,7 @@
             TokenTag.Plus => "+",
             TokenTag.Comma => ",",
             TokenTag.Semicolon => ";",
+            TokenTag.Colon => ":",
             TokenTag.LParen => "(",
             TokenTag.RParen => ")",
             TokenTag.LBrace => "{",

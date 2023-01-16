@@ -2,6 +2,7 @@
 using ork.ast;
 using ork.parser;
 using static System.Net.Mime.MediaTypeNames;
+using System.Security.Cryptography;
 
 namespace ork.tests
 {
@@ -470,6 +471,61 @@ namespace ork.tests
             Assert.IsNotNull(ie);
             TestIdentifier(ie.Left, "myArray");
             TestInfixExpression(ie.Index, 1L, "+", 1L);
+        }
+
+        [TestMethod]
+        public void TestParsingEmptyHashLiterals()
+        {
+            string input = "{}";
+
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);
+            Assert.IsNotNull(program);
+            Assert.AreEqual(1, program.Statements.Count);
+
+            ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(es);
+
+            HashLiteral? hl = es.Expression as HashLiteral;
+            Assert.IsNotNull(hl);
+            Assert.AreEqual(0, hl.Pairs.Count);
+        }
+
+        [TestMethod]
+        public void TestParsingHashLiteralsStringKeys()
+        {
+            string input = """{"one": 1, "two": 2, "three": 3}""";
+
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);
+            Assert.IsNotNull(program);
+            Assert.AreEqual(1, program.Statements.Count);
+
+            ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(es);
+
+            HashLiteral? hl = es.Expression as HashLiteral;
+            Assert.IsNotNull(hl);
+            Assert.AreEqual(3, hl.Pairs.Count);
+
+            var expected = new Dictionary<string, long>()
+            {
+                {"one", 1L}, {"two", 2L }, {"three", 3L },
+            };
+            foreach (var (k, v) in hl.Pairs)
+            {
+                StringLiteral? sl = k as StringLiteral;
+                Assert.IsNotNull(sl);
+                if (!expected.TryGetValue(sl.ToString(), out var expectedValue))
+                {
+                    Assert.Fail($"key: {sl.ToString()} not found");
+                }
+                TestIntegerLiteral(v, expectedValue);
+            }
         }
     }
 }
