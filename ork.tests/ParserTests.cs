@@ -425,5 +425,28 @@ namespace ork.tests
             TestInfixExpression(fl.Arguments[1], 2L, "*", 3L);
             TestInfixExpression(fl.Arguments[2], 4L, "+", 5L); 
         }
+
+        [TestMethod]
+        public void TestParsingArrayLiterals()
+        {
+            string input = "[1, 2*2, 3 + 3]";
+
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);
+            Assert.IsNotNull(program);
+            Assert.AreEqual(1, program.Statements.Count);
+
+            ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(es);
+
+            ArrayLiteral? al = es.Expression as ArrayLiteral;
+            Assert.IsNotNull(al);
+            Assert.AreEqual(3, al.Elements.Count);
+            TestIntegerLiteral(al.Elements[0], 1L);
+            TestInfixExpression(al.Elements[1], 2L, "*", 2L);
+            TestInfixExpression(al.Elements[2], 3L, "+", 3L);
+        }
     }
 }

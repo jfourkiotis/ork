@@ -9,7 +9,7 @@ namespace ork.tests
         [TestMethod]
         public void TestNextTokenSimple()
         {
-            const string input = "=+(){},;";
+            const string input = "=+(){},;[]";
 
             var tests = new[]
             {
@@ -21,6 +21,8 @@ namespace ork.tests
                 new { Tag = TokenTag.RBrace, ExpectedLiteral = "}" },
                 new { Tag = TokenTag.Comma, ExpectedLiteral = "," },
                 new { Tag = TokenTag.Semicolon, ExpectedLiteral = ";" },
+                new { Tag = TokenTag.LBracket, ExpectedLiteral = "[" },
+                new { Tag = TokenTag.RBracket, ExpectedLiteral = "]" },
                 new { Tag = TokenTag.Eof, ExpectedLiteral = "" },
             };
 
@@ -98,6 +100,7 @@ namespace ork.tests
                 10 != 9;
                 "foobar"
                 "foo bar"
+                [1, 2]
                 """;
 
             var tests = new[]
@@ -184,6 +187,11 @@ namespace ork.tests
                 new { Tag = TokenTag.Semicolon, ExpectedLiteral = ";" },
                 new { Tag = TokenTag.String, ExpectedLiteral = "foobar" },
                 new { Tag = TokenTag.String, ExpectedLiteral = "foo bar" },
+                new { Tag = TokenTag.LBracket, ExpectedLiteral = "[" },
+                new { Tag = TokenTag.Int, ExpectedLiteral = "1" },
+                new { Tag = TokenTag.Comma, ExpectedLiteral = "," },
+                new { Tag = TokenTag.Int, ExpectedLiteral = "2" },
+                new { Tag = TokenTag.RBracket, ExpectedLiteral = "]" },
             };
 
             Lexer lexer = new Lexer(input);

@@ -34,6 +34,7 @@ namespace ork.parser
             { TokenTag.True, p => p.ParseBooleanLiteral() },
             { TokenTag.False, p => p.ParseBooleanLiteral() },
             { TokenTag.LParen, p => p.ParseGroupedExpression() },
+            { TokenTag.LBracket, p => p.ParseArrayLiteral() },
             { TokenTag.If, p => p.ParseIfExpression() },
             { TokenTag.Function, p => p.ParseFunctionLiteral() },
             { TokenTag.String, p => p.ParseStringLiteral() },
@@ -232,6 +233,14 @@ namespace ork.parser
             return ExpectPeek(TokenTag.RParen) ? e : null;
         }
 
+        private ArrayLiteral? ParseArrayLiteral()
+        {
+            Token arrToken = curToken;
+            var elements = ParseExpressionList(TokenTag.RBracket);
+            if (elements is null) return null;
+            return new ArrayLiteral(arrToken, elements);
+        }
+
         private IfExpression? ParseIfExpression()
         {
             Token ifToken = curToken;
@@ -331,16 +340,16 @@ namespace ork.parser
         private CallExpression? ParseCallExpression(Expression lhs)
         {
             Token callToken = curToken;
-            var arguments = ParseCallArguments();
+            var arguments = ParseExpressionList(TokenTag.RParen);
             if (arguments is null) return null;
             return new CallExpression(callToken, lhs, arguments);
         }
 
-        private IList<Expression>? ParseCallArguments()
+        private IList<Expression>? ParseExpressionList(TokenTag endTag)
         {
             List<Expression> arguments = new();
 
-            if (PeekTokenIs(TokenTag.RParen))
+            if (PeekTokenIs(endTag))
             {
                 NextToken();
                 return arguments;
@@ -362,7 +371,7 @@ namespace ork.parser
                 arguments.Add(arg);
             }
 
-            if (!ExpectPeek(TokenTag.RParen))
+            if (!ExpectPeek(endTag))
                 return null;
 
             return arguments;

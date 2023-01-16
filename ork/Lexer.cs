@@ -39,6 +39,8 @@
                 ')' => new Token(TokenTag.RParen, ch.ToString()),
                 '{' => new Token(TokenTag.LBrace, ch.ToString()),
                 '}' => new Token(TokenTag.RBrace, ch.ToString()),
+                '[' => new Token(TokenTag.LBracket, ch.ToString()),
+                ']' => new Token(TokenTag.RBracket, ch.ToString()),
                 ',' => new Token(TokenTag.Comma, ch.ToString()),
                 '+' => new Token(TokenTag.Plus, ch.ToString()),
                 '-' => new Token(TokenTag.Minus, ch.ToString()),

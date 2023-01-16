@@ -297,4 +297,25 @@ namespace ork.ast
             return sb.ToString();
         }
     }
+
+    public sealed class ArrayLiteral : Expression
+    {
+        public ArrayLiteral(Token token, IList<Expression> elements) : base(token)
+        {
+            Elements = elements.AsReadOnly();
+        }
+
+        public ReadOnlyCollection<Expression> Elements { get; }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+
+            sb.Append('[');
+            sb.Append(String.Join(',', Elements));
+            sb.Append(']');
+
+            return sb.ToString();
+        }
+    }
 }

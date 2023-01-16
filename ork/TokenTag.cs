@@ -27,6 +27,8 @@
         RParen,
         LBrace,
         RBrace,
+        LBracket,
+        RBracket,
 
         // keywords
         Function,
@@ -55,6 +57,8 @@
             TokenTag.RParen => ")",
             TokenTag.LBrace => "{",
             TokenTag.RBrace => "}",
+            TokenTag.LBracket => "[",
+            TokenTag.RBracket => "]",
             TokenTag.Function => "fn",
             TokenTag.Let => "let",
             TokenTag.Minus => "-",
