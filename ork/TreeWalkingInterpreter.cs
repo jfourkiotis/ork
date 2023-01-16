@@ -1,7 +1,6 @@
 using ork.ast;
 using ork.builtins;
 using System.Collections.Immutable;
-using System.ComponentModel.Design;
 
 namespace ork;
 
@@ -190,11 +189,7 @@ public sealed class TreeWalkingInterpreter
                 }
                 else if (left is ImmutableDictionary<object, object?> d && index is not null)
                 {
-                    if (!d.TryGetValue(index, out var val))
-                    {
-                        return null;
-                    }
-                    return val;
+                    return !d.TryGetValue(index, out var val) ? null : val;
                 }
                 throw new OrkRuntimeException($"index operator not supported: {TypeName(left)}");
             case HashLiteral hashLiteral:

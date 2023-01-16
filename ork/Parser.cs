@@ -1,7 +1,6 @@
 ﻿using ork.ast;
 using ork.lexer;
 using ork.tokens;
-using System.Runtime.CompilerServices;
 
 namespace ork.parser
 {
@@ -198,7 +197,7 @@ namespace ork.parser
 
         private Expression ParseStringLiteral()
         {
-            return new ork.ast.StringLiteral(curToken);
+            return new StringLiteral(curToken);
         }
 
         private Expression? ParseHashLiteral()

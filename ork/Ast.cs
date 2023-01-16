@@ -13,7 +13,7 @@ namespace ork.ast
             Token = token;
         }
 
-        public Token Token { get; }
+        protected Token Token { get; }
         public string TokenLiteral => Token.Literal;
     }
 
