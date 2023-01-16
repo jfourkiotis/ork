@@ -318,4 +318,29 @@ namespace ork.ast
             return sb.ToString();
         }
     }
+
+    public sealed class IndexExpression : Expression
+    {
+        public IndexExpression(Token token, Expression left, Expression index) : base(token)
+        {
+            Left = left;
+            Index = index;
+        }
+
+        public Expression Left { get; }
+        public Expression Index { get; }
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+
+            sb.Append('(');
+            sb.Append(Left);
+            sb.Append('[');
+            sb.Append(Index);
+            sb.Append(']');
+            sb.Append(')');
+
+            return sb.ToString();
+        }
+    }
 }

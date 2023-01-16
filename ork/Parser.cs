@@ -17,6 +17,7 @@ namespace ork.parser
         Product,
         Prefix,
         Call, 
+        Index,
     }
 
     public sealed class Parser
@@ -51,6 +52,7 @@ namespace ork.parser
             { TokenTag.LessThan, (p, lhs) => p.ParseInfixExpression(lhs) },
             { TokenTag.GreaterThan, (p, lhs) => p.ParseInfixExpression(lhs) },
             { TokenTag.LParen, (p, lhs) => p.ParseCallExpression(lhs) },
+            { TokenTag.LBracket, (p, lhs) => p.ParseIndexExpression(lhs) },
         };
 
         private static readonly IDictionary<TokenTag, Precedence> Precedences = new Dictionary<TokenTag, Precedence>()
@@ -64,6 +66,7 @@ namespace ork.parser
             { TokenTag.Asterisk, Precedence.Product },
             { TokenTag.Slash, Precedence.Product },
             { TokenTag.LParen, Precedence.Call },
+            { TokenTag.LBracket, Precedence.Index },
         };
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -343,6 +346,17 @@ namespace ork.parser
             var arguments = ParseExpressionList(TokenTag.RParen);
             if (arguments is null) return null;
             return new CallExpression(callToken, lhs, arguments);
+        }
+
+        private IndexExpression? ParseIndexExpression(Expression lhs)
+        {
+            Token indexToken = curToken;
+
+            NextToken();
+            var index = ParseExpression(Precedence.Lowest);
+            if (index is null || !ExpectPeek(TokenTag.RBracket)) 
+                return null;
+            return new IndexExpression(indexToken, lhs, index);
         }
 
         private IList<Expression>? ParseExpressionList(TokenTag endTag)

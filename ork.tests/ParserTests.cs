@@ -272,6 +272,8 @@ namespace ork.tests
                 new { Input = "a + add(b * c) + d", Expected = "((a + add((b * c))) + d)" },
                 new { Input = "add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", Expected = "add(a,b,1,(2 * 3),(4 + 5),add(6,(7 * 8)))" },
                 new { Input = "add(a + b + c * d / f + g)", Expected = "add((((a + b) + ((c * d) / f)) + g))" },
+                new { Input = "a * [1, 2, 3, 4][b * c] * d", Expected = "((a * ([1,2,3,4][(b * c)])) * d)"},
+                new { Input = "add(a * b[2], b[1], 2 * [1, 2][1])", Expected = "add((a * (b[2])),(b[1]),(2 * ([1,2][1])))" },
             };
 
             foreach (var test in tests)
@@ -447,6 +449,27 @@ namespace ork.tests
             TestIntegerLiteral(al.Elements[0], 1L);
             TestInfixExpression(al.Elements[1], 2L, "*", 2L);
             TestInfixExpression(al.Elements[2], 3L, "+", 3L);
+        }
+
+        [TestMethod]
+        public void TestParsingIndexExpressions()
+        {
+            string input = "myArray[1+1]";
+
+            var lexer = new Lexer(input);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            Assert.AreEqual(0, parser.Errors.Count);
+            Assert.IsNotNull(program);
+            Assert.AreEqual(1, program.Statements.Count);
+
+            ExpressionStatement? es = program.Statements[0] as ExpressionStatement;
+            Assert.IsNotNull(es);
+
+            IndexExpression? ie = es.Expression as IndexExpression;
+            Assert.IsNotNull(ie);
+            TestIdentifier(ie.Left, "myArray");
+            TestInfixExpression(ie.Index, 1L, "+", 1L);
         }
     }
 }
