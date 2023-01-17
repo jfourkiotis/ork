@@ -6,27 +6,50 @@ using ork.tokens;
 
 namespace ork.ast
 {
+    public enum AstTag
+    {
+        ExpressionStatement,
+        LetStatement,
+        ReturnStatement,
+        BlockStatement,
+        Identifier,
+        IntegerLiteral,
+        TrueLiteral,
+        FalseLiteral,
+        StringLiteral,
+        FunctionLiteral,
+        ArrayLiteral,
+        HashLiteral,
+        PrefixExpression,
+        InfixExpression,
+        IfExpression,
+        CallExpression,
+        IndexExpression,
+    }
     public abstract class Node
     {
-        protected Node(Token token)
+        protected Node(Token token, AstTag tag)
         {
             Token = token;
+            Tag = tag;
         }
 
         protected Token Token { get; }
+        public AstTag Tag { get; }
+
         public string TokenLiteral => Token.Literal;
     }
 
     public abstract class Statement : Node
     {
-        protected Statement(Token token) : base(token)
+        protected Statement(Token token, AstTag tag) : base(token, tag)
         {
         }
     }
 
     public abstract class Expression : Node
     {
-        protected Expression(Token token) : base(token)
+        protected Expression(Token token, AstTag tag) : base(token, tag)
         {
         }
     }
@@ -56,7 +79,7 @@ namespace ork.ast
 
     public sealed class ExpressionStatement : Statement
     {      
-        public ExpressionStatement(Token token, Expression? expression) : base(token) 
+        public ExpressionStatement(Token token, Expression? expression) : base(token, AstTag.ExpressionStatement) 
         {
             Expression = expression;
         }
@@ -68,7 +91,7 @@ namespace ork.ast
 
     public sealed class Identifier : Expression
     {
-        public Identifier(Token token) : base(token)
+        public Identifier(Token token) : base(token, AstTag.Identifier)
         {
         }
 
@@ -80,7 +103,7 @@ namespace ork.ast
 
     public sealed class LetStatement : Statement
     {
-        public LetStatement(Token token, Identifier name, Expression expression) : base(token)
+        public LetStatement(Token token, Identifier name, Expression expression) : base(token, AstTag.LetStatement)
         {
             Name = name;
             Expression = expression;
@@ -103,7 +126,7 @@ namespace ork.ast
 
     public sealed class ReturnStatement : Statement
     {
-        public ReturnStatement(Token token, Expression? expression) : base(token)
+        public ReturnStatement(Token token, Expression? expression) : base(token, AstTag.ReturnStatement)
         {
             Expression = expression;
         }
@@ -127,7 +150,7 @@ namespace ork.ast
 
     public sealed class IntegerLiteral : Expression
     {
-        public IntegerLiteral(Token token, Int64 val) : base(token)
+        public IntegerLiteral(Token token, Int64 val) : base(token, AstTag.IntegerLiteral)
         {
             Value = val;
         }
@@ -141,7 +164,7 @@ namespace ork.ast
 
     public sealed class PrefixExpression : Expression
     {
-        public PrefixExpression(Token token, Expression rhs) : base(token) 
+        public PrefixExpression(Token token, Expression rhs) : base(token, AstTag.PrefixExpression) 
         { 
             Rhs = rhs; 
         }
@@ -156,7 +179,7 @@ namespace ork.ast
     
     public sealed class InfixExpression : Expression
     {
-        public InfixExpression(Token token, Expression lhs, Expression rhs) : base(token)
+        public InfixExpression(Token token, Expression lhs, Expression rhs) : base(token, AstTag.InfixExpression)
         {
             Lhs = lhs;
             Rhs = rhs;
@@ -179,7 +202,7 @@ namespace ork.ast
 
     public sealed class TrueLiteral : Expression
     {
-        public TrueLiteral(Token token) : base(token)
+        public TrueLiteral(Token token) : base(token, AstTag.TrueLiteral)
         {
 
         }
@@ -188,7 +211,7 @@ namespace ork.ast
     
     public sealed class FalseLiteral : Expression
     {
-        public FalseLiteral(Token token) : base(token)
+        public FalseLiteral(Token token) : base(token, AstTag.FalseLiteral)
         {
 
         }
@@ -197,7 +220,7 @@ namespace ork.ast
 
     public sealed class StringLiteral : Expression
     {
-        public StringLiteral(Token token) : base(token)
+        public StringLiteral(Token token) : base(token, AstTag.StringLiteral)
         {
 
         }
@@ -207,7 +230,7 @@ namespace ork.ast
 
     public sealed class BlockStatement : Statement
     {
-        public BlockStatement(Token token, IList<Statement> statements) : base(token)
+        public BlockStatement(Token token, IList<Statement> statements) : base(token, AstTag.BlockStatement)
         {
             Statements = statements.AsReadOnly();
         }
@@ -227,7 +250,7 @@ namespace ork.ast
     public sealed class IfExpression : Expression
     {
         public IfExpression(Token token, Expression condition, BlockStatement thenStatement,
-            BlockStatement? elseStatement) : base(token)
+            BlockStatement? elseStatement) : base(token, AstTag.IfExpression)
         {
             Condition = condition;
             Then = thenStatement;
@@ -255,7 +278,7 @@ namespace ork.ast
 
     public sealed class FunctionLiteral : Expression
     {
-        public FunctionLiteral(Token token, IList<Identifier> parameters, BlockStatement body) : base(token)
+        public FunctionLiteral(Token token, IList<Identifier> parameters, BlockStatement body) : base(token, AstTag.FunctionLiteral)
         {
             Parameters = parameters.AsReadOnly();
             Body = body;
@@ -277,7 +300,7 @@ namespace ork.ast
 
     public sealed class CallExpression : Expression
     {
-        public CallExpression(Token token, Expression function, IList<Expression> arguments) : base(token)
+        public CallExpression(Token token, Expression function, IList<Expression> arguments) : base(token, AstTag.CallExpression)
         {
             Function = function;
             Arguments = arguments.AsReadOnly();
@@ -301,7 +324,7 @@ namespace ork.ast
 
     public sealed class ArrayLiteral : Expression
     {
-        public ArrayLiteral(Token token, IList<Expression> elements) : base(token)
+        public ArrayLiteral(Token token, IList<Expression> elements) : base(token, AstTag.ArrayLiteral)
         {
             Elements = elements.AsReadOnly();
         }
@@ -322,7 +345,7 @@ namespace ork.ast
 
     public sealed class IndexExpression : Expression
     {
-        public IndexExpression(Token token, Expression left, Expression index) : base(token)
+        public IndexExpression(Token token, Expression left, Expression index) : base(token, AstTag.IndexExpression)
         {
             Left = left;
             Index = index;
@@ -347,7 +370,7 @@ namespace ork.ast
 
     public sealed class HashLiteral : Expression
     {
-        public HashLiteral(Token token, IDictionary<Expression, Expression?> pairs) : base(token) 
+        public HashLiteral(Token token, IDictionary<Expression, Expression?> pairs) : base(token, AstTag.HashLiteral) 
         {
             Pairs = pairs.ToImmutableDictionary();
         }
