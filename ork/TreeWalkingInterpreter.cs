@@ -182,9 +182,10 @@ public sealed class TreeWalkingInterpreter
                             fenv.Set(f.Parameters[index1].TokenLiteral, Eval(v, env));
                             index1++;
                         }
-                        node = f.Body;
-                        env = fenv;
-                        goto start;
+                        var br = Eval(f.Body, fenv);
+                        if (ret)
+                            ret = false;
+                        return br;
                     case Func<object?[], object?> b:
                         return b(callExpression.Arguments.Select(a => Eval(a, env)).ToArray());
                     default:

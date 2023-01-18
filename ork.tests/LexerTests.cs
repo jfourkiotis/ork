@@ -49,12 +49,18 @@ namespace ork.tests
         public void TestCommentsWithSourceCode()
         {
             string input = """
+                let x = 10;
                 #
                 # number of dogs
                 let y = 10;
             """;
             var tests = new[]
             {
+                new { Tag = TokenTag.Let, ExpectedLiteral = "let" },
+                new { Tag = TokenTag.Ident, ExpectedLiteral = "x" },
+                new { Tag = TokenTag.Assign, ExpectedLiteral = "=" },
+                new { Tag = TokenTag.Int, ExpectedLiteral = "10" },
+                new { Tag = TokenTag.Semicolon, ExpectedLiteral = ";" },
                 new { Tag = TokenTag.Let, ExpectedLiteral = "let" },
                 new { Tag = TokenTag.Ident, ExpectedLiteral = "y" },
                 new { Tag = TokenTag.Assign, ExpectedLiteral = "=" },
