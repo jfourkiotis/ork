@@ -204,6 +204,12 @@ public sealed class TreeWalkingInterpreter
                 else if (left is ImmutableDictionary<object, object?> d && index is not null)
                 {
                     return !d.TryGetValue(index, out var dval) ? null : dval;
+                } 
+                else if (left is string s && index is long a)
+                {
+                    if (a < 0 || a > s.Length - 1)
+                        return null;
+                    return s[(int)a].ToString(); // TODO
                 }
                 throw new OrkRuntimeException($"index operator not supported: {TypeName(left)}");
             case AstTag.HashLiteral:
