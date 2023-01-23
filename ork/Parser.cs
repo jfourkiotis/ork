@@ -127,7 +127,7 @@ namespace ork.parser
         {
             if (!PrefixParseFns.TryGetValue(curToken.Tag, out PrefixParseFn? prefix))
             {
-                Errors.Add($"no prefix parse function for {curToken.Tag} found");
+                Errors.Add($"unexpected '{curToken.Tag}' found [PREFIX]");
                 return null;
             }
 
@@ -322,6 +322,9 @@ namespace ork.parser
                     statements.Add(stmt);
                 NextToken();
             }
+
+            if (!CurTokenIs(TokenTag.RBrace))
+                Errors.Add($"expected next token to be '}}' but got '{curToken.Tag.Name()}' instead");
 
             return new BlockStatement(braceToken, statements);
         }
