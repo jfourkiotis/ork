@@ -178,6 +178,10 @@ public sealed class TreeWalkingInterpreter
                 {
                     case Function f:
                         Environment fenv = new Environment(f.Environment);
+                        if (callExpression.Arguments.Count != f.Parameters.Count)
+                        {
+                            throw new OrkRuntimeException($"invalid number of arguments: expected {f.Parameters.Count} but {callExpression.Arguments.Count} were given");
+                        }
                         int index1 = 0;
                         foreach (var v in callExpression.Arguments)
                         {
