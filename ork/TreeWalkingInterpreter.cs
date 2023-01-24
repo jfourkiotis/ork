@@ -102,6 +102,8 @@ public sealed class TreeWalkingInterpreter
                         return infixExpression.TokenLiteral switch
                         {
                             "+" => s1 + s2,
+                            "==" => s1 == s2,
+                            "!=" => s1 != s2,
                             _ => throw new OrkRuntimeException(
                                 $"unknown operator: {TypeName(s1)} {infixExpression.TokenLiteral} {TypeName(s2)}"),
                         };
