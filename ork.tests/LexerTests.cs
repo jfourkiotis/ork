@@ -38,6 +38,49 @@ namespace ork.tests
         }
 
         [TestMethod]
+        public void TestNextTokenPosition()
+        {
+            const string input = 
+"""
++
++ 
+ ++
+!=
+    ===
+ =
+ 44 55
+some_identifier
+    "hello world"
+""";
+            var tests = new[]
+            {
+                new { Tag = TokenTag.Plus, ExpectedLine = 1, ExpectedPos = 1},
+                new { Tag = TokenTag.Plus, ExpectedLine = 2, ExpectedPos = 1},
+                new { Tag = TokenTag.Plus, ExpectedLine = 3, ExpectedPos = 2},
+                new { Tag = TokenTag.Plus, ExpectedLine = 3, ExpectedPos = 3},
+                new { Tag = TokenTag.NotEq, ExpectedLine = 4, ExpectedPos = 1},
+                new { Tag = TokenTag.Eq, ExpectedLine = 5, ExpectedPos = 5},
+                new { Tag = TokenTag.Assign, ExpectedLine = 5, ExpectedPos = 7},
+                new { Tag = TokenTag.Assign, ExpectedLine = 6, ExpectedPos = 2},
+                new { Tag = TokenTag.Int, ExpectedLine = 7, ExpectedPos = 2},
+                new { Tag = TokenTag.Int, ExpectedLine = 7, ExpectedPos = 5},
+                new { Tag = TokenTag.Ident, ExpectedLine = 8, ExpectedPos = 1},
+                new { Tag = TokenTag.String, ExpectedLine = 9, ExpectedPos = 5},
+
+            };
+
+            Lexer lexer = new Lexer(input);
+
+            foreach (var test in tests)
+            {
+                var tok = lexer.NextToken();
+                Assert.AreEqual(test.Tag, tok.Tag);
+                Assert.AreEqual(test.ExpectedLine, tok.Line);
+                Assert.AreEqual(test.ExpectedPos, tok.Pos);
+            }
+        }
+
+        [TestMethod]
         public void TestComments()
         {
             string input = "# hello world";

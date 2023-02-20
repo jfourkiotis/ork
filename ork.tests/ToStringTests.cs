@@ -10,7 +10,7 @@ namespace ork.tests
         {
             var program = new Program(new List<Statement>()
             {
-                new LetStatement(new tokens.Token(tokens.TokenTag.Let, "let"), new Identifier(new tokens.Token(tokens.TokenTag.Ident, "myVar")), new Identifier(new tokens.Token(tokens.TokenTag.Ident, "anotherVar"))),
+                new LetStatement(new tokens.Token(tokens.TokenTag.Let, "let", 0, 0), new Identifier(new tokens.Token(tokens.TokenTag.Ident, "myVar", 0, 0)), new Identifier(new tokens.Token(tokens.TokenTag.Ident, "anotherVar", 0, 0))),
             });
             Assert.AreEqual("let myVar = anotherVar;", program.ToString());
         }

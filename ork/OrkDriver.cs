@@ -49,18 +49,17 @@ internal static class OrkDriver
 
     private static void Run(string line, TreeWalkingInterpreter tw, Environment env)
     {
-        var lexer = new Lexer(line);
-        var parser = new Parser(lexer);
-        var program = parser.ParseProgram();
-        if (parser.Errors.Count != 0)
-        {
-            foreach (var msg in parser.Errors)
-                Console.WriteLine(msg);
-            return;
-        }
-
         try
         {
+            var lexer = new Lexer(line);
+            var parser = new Parser(lexer);
+            var program = parser.ParseProgram();
+            if (parser.Errors.Count != 0)
+            {
+                foreach (var msg in parser.Errors)
+                    Console.WriteLine(msg);
+                return;
+            }
             var t0 = System.Diagnostics.Stopwatch.StartNew();
             var result = tw.Eval(program, env);
             t0.Stop();

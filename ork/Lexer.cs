@@ -20,6 +20,8 @@
         private int position; // current position in input (points to current char)
         private int readPosition; // current reading position in input (after current char)
         private char ch; // current char under examination
+        private int line = 1; // current line
+        private int line_offset = 0;
 
         public Lexer(string input)
         {
@@ -34,28 +36,28 @@
             Token tok = ch switch
             {
                 '=' => ReadAssignmentOrEq(),
-                ';' => new Token(TokenTag.Semicolon, ch.ToString()),
-                ':' => new Token(TokenTag.Colon, ch.ToString()),
-                '(' => new Token(TokenTag.LParen, ch.ToString()),
-                ')' => new Token(TokenTag.RParen, ch.ToString()),
-                '{' => new Token(TokenTag.LBrace, ch.ToString()),
-                '}' => new Token(TokenTag.RBrace, ch.ToString()),
-                '[' => new Token(TokenTag.LBracket, ch.ToString()),
-                ']' => new Token(TokenTag.RBracket, ch.ToString()),
-                ',' => new Token(TokenTag.Comma, ch.ToString()),
-                '+' => new Token(TokenTag.Plus, ch.ToString()),
-                '-' => new Token(TokenTag.Minus, ch.ToString()),
-                '*' => new Token(TokenTag.Asterisk, ch.ToString()),
-                '/' => new Token(TokenTag.Slash, ch.ToString()),
+                ';' => new Token(TokenTag.Semicolon, ch.ToString(), line, position+1-line_offset),
+                ':' => new Token(TokenTag.Colon, ch.ToString(), line, position+1-line_offset),
+                '(' => new Token(TokenTag.LParen, ch.ToString(), line, position+1-line_offset),
+                ')' => new Token(TokenTag.RParen, ch.ToString(), line, position+1-line_offset),
+                '{' => new Token(TokenTag.LBrace, ch.ToString(), line, position+1-line_offset),
+                '}' => new Token(TokenTag.RBrace, ch.ToString(), line, position+1-line_offset),
+                '[' => new Token(TokenTag.LBracket, ch.ToString(), line, position+1-line_offset),
+                ']' => new Token(TokenTag.RBracket, ch.ToString(), line, position+1-line_offset),
+                ',' => new Token(TokenTag.Comma, ch.ToString(), line, position+1-line_offset),
+                '+' => new Token(TokenTag.Plus, ch.ToString(), line, position+1-line_offset),
+                '-' => new Token(TokenTag.Minus, ch.ToString(), line, position+1-line_offset),
+                '*' => new Token(TokenTag.Asterisk, ch.ToString(), line, position+1-line_offset),
+                '/' => new Token(TokenTag.Slash, ch.ToString(), line, position+1-line_offset),
                 '!' => ReadBangOrNotEq(),
-                '<' => new Token(TokenTag.LessThan, ch.ToString()),
-                '>' => new Token(TokenTag.GreaterThan, ch.ToString()),
+                '<' => new Token(TokenTag.LessThan, ch.ToString(), line, position+1-line_offset),
+                '>' => new Token(TokenTag.GreaterThan, ch.ToString(), line, position+1-line_offset),
                 '#' => ConsumeCommentAndContinue(out readNext),
                 '"' => ReadString(),
-                '\0' => new Token(TokenTag.Eof, ""),
+                '\0' => new Token(TokenTag.Eof, "", line, position+1-line_offset),
                 _ when Char.IsLetter(ch) => ReadIdentifierOrKeyword(out readNext), 
                 _ when Char.IsDigit(ch) => ReadNumber(out readNext),
-                _ => throw new NotImplementedException($"{ch}"),
+                _ => throw new OrkRuntimeException($"Invalid character: {ch}"),
             };
 
             if (readNext)
@@ -69,6 +71,12 @@
         {
             while (Char.IsWhiteSpace(ch))
             {
+                if (ch == '\n')
+                {
+                    line++;
+                    // one character past the '\n' character
+                    line_offset = readPosition;
+                }
                 ReadChar();
             }
         }
@@ -94,7 +102,7 @@
             }
 
             var literal = input.Substring(pos, position - pos);
-            return Keywords.TryGetValue(literal, out TokenTag keyTag) ? new Token(keyTag, literal) : new Token(TokenTag.Ident, literal);
+            return Keywords.TryGetValue(literal, out TokenTag keyTag) ? new Token(keyTag, literal, line, pos - line_offset + 1) : new Token(TokenTag.Ident, literal, line, pos - line_offset + 1);
         }
 
         private Token ReadNumber(out bool readNext)
@@ -107,20 +115,20 @@
             }
 
             var number = input.Substring(pos, position - pos);
-            return new Token(TokenTag.Int, number);
+            return new Token(TokenTag.Int, number, line, pos - line_offset + 1);
         }
 
         private Token ReadAssignmentOrEq()
         {
-            if (PeekNext() != '=') return new Token(TokenTag.Assign, "=");
+            if (PeekNext() != '=') return new Token(TokenTag.Assign, "=", line, position+1-line_offset);
             ReadChar();
-            return new Token(TokenTag.Eq, "==");
+            return new Token(TokenTag.Eq, "==", line, position - line_offset);
         }
         private Token ReadBangOrNotEq()
         {
-            if (PeekNext() != '=') return new Token(TokenTag.Bang, "!");
+            if (PeekNext() != '=') return new Token(TokenTag.Bang, "!", line, position+1-line_offset);
             ReadChar();
-            return new Token(TokenTag.NotEq, "!=");
+            return new Token(TokenTag.NotEq, "!=", line, position - line_offset);
         }
 
         private Token ConsumeCommentAndContinue(out bool readNext)
@@ -128,6 +136,7 @@
             readNext = false;
             while (ch != '\n' && ch != Char.MinValue)
                 ReadChar();
+            line++;
             return NextToken();
         }
 
@@ -141,7 +150,7 @@
                     break;
             }
 
-            return new Token(TokenTag.String, input.Substring(pos, position - pos));
+            return new Token(TokenTag.String, input.Substring(pos, position - pos), line, pos - line_offset);
         }
     }
 }
